@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Agorlab — El ágora digital</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -31,11 +30,9 @@
     }
   }
 </script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -90,7 +87,6 @@
 
 <body class="min-h-screen">
 
-<!-- NAVBAR -->
 <header class="sticky top-0 z-40 border-b border-app backdrop-blur-xl" style="background: color-mix(in srgb, var(--bg) 82%, transparent);">
   <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
     <a href="#" class="font-display font-bold text-2xl tracking-tight flex items-center gap-2 text-main">
@@ -216,7 +212,7 @@
   </div>
 </div>
 
-<!-- MODAL EDITAR PRODUCTO (ADMIN) -->
+<!-- MODAL EDITAR PRODUCTO -->
 <div id="modal-product-edit" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
   <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-lg w-full p-8 animate-slide-up my-8">
     <div class="flex items-center justify-between mb-5">
@@ -299,7 +295,6 @@ import {
   onSnapshot, query, where, orderBy, serverTimestamp, getDocs
 } from 'firebase/firestore';
 
-/* ========== CONFIG ========== */
 const firebaseConfig = {
   apiKey: "AIzaSyCkhVbKYq1hpwsGv6RQCc2aZndIHypMFgI",
   authDomain: "agorlab-55cf1.firebaseapp.com",
@@ -323,18 +318,17 @@ const COVERAGE_ZONES = [
   { name: 'Miramar',             lat: -38.2700, lng: -57.8400, radiusKm: 12 }
 ];
 
-/* ========== STATE ========== */
 const state = {
   user: null, isAdmin: false, profile: null,
   products: [], categories: [],
   cart: JSON.parse(localStorage.getItem('agorlab_cart') || '[]'),
   adminTab: 'upload', activeCategory: 'all',
-  geoResult: null, profilePhotoUrl: '', onboardingOpened: false
+  geoResult: null, profilePhotoUrl: '', onboardingOpened: false,
+  authReady: false
 };
 let selectedTags = new Set();
 let editingProduct = null;
 
-/* ========== UTILS ========== */
 const $ = (id) => document.getElementById(id);
 const saveCart = () => localStorage.setItem('agorlab_cart', JSON.stringify(state.cart));
 const fmtMoney = (n) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n || 0);
@@ -353,7 +347,6 @@ function showToast(msg, type = 'info') {
 const openModal = (id) => { const m = $(id); m.classList.remove('hidden'); m.classList.add('flex'); };
 const closeModal = (id) => { const m = $(id); m.classList.add('hidden'); m.classList.remove('flex'); };
 
-/* ========== TEMA ========== */
 function applyTheme(theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark');
   $('icon-sun').classList.toggle('hidden', theme === 'dark');
@@ -366,58 +359,152 @@ $('btn-theme-toggle').addEventListener('click', () => {
   applyTheme(next);
 });
 
-/* ========== IMGBB ========== */
+/* ============ IMGBB (con URL directa garantizada) ============ */
+function isDirectImgBB(url) {
+  if (!url) return false;
+  // URL directa: https://i.ibb.co/XXXXX/archivo.jpg
+  // URL visor:   https://ibb.co/XXXXX o https://www.ibb.co/...
+  return /^https:\/\/i\.ibb\.co\/.+/.test(url);
+}
 function pickDirectUrl(json) {
   const d = json.data || {};
-  const candidates = [d.image?.url, d.display_url, d.medium?.url, d.thumb?.url, d.url];
-  return candidates.find(u => typeof u === 'string' && u.startsWith('https://i.ibb.co/'))
-      || d.url
-      || candidates.find(u => typeof u === 'string');
+  // Intentar todas las URLs posibles y priorizar la directa
+  const candidates = [
+    d.image?.url,
+    d.display_url,
+    d.url,
+    d.medium?.url,
+    d.thumb?.url
+  ];
+  // Primero: URL directa (i.ibb.co)
+  const direct = candidates.find(u => isDirectImgBB(u));
+  if (direct) return direct;
+  // Si no hay directa, intentar la primera que exista
+  const any = candidates.find(u => typeof u === 'string' && u.startsWith('http'));
+  return any || null;
 }
 async function uploadImageToImgBB(file) {
+  // Validación del archivo
+  if (!file) throw new Error('No se recibió ningún archivo');
+  if (!file.type.startsWith('image/')) throw new Error('El archivo no es una imagen');
+  if (file.size > 32 * 1024 * 1024) throw new Error('La imagen no puede superar los 32MB');
+
+  // Convertir a base64 (evita problemas de CORS y encoding)
   const b64 = await new Promise((res, rej) => {
     const r = new FileReader();
     r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
+    r.onerror = () => rej(new Error('Error al leer el archivo'));
     r.readAsDataURL(file);
   });
+
   const fd = new FormData();
   fd.append('image', b64);
-  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: fd });
-  if (!res.ok) throw new Error('ImgBB rechazó la subida');
+  
+  let res;
+  try {
+    res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: fd
+    });
+  } catch (e) {
+    throw new Error('No se pudo conectar con el servidor de imágenes');
+  }
+  
+  if (!res.ok) throw new Error(`ImgBB respondió con error ${res.status}`);
+  
   const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || 'Error de ImgBB');
+  if (!json.success) throw new Error(json.error?.message || 'ImgBB rechazó la imagen');
+  
   const url = pickDirectUrl(json);
-  console.log('✅ URL directa guardada:', url);
-  if (!url) throw new Error('ImgBB no devolvió URL');
+  if (!url) throw new Error('ImgBB no devolvió una URL válida');
+  if (!isDirectImgBB(url)) {
+    console.warn('URL no directa recibida:', url);
+    // Aunque no sea "i.ibb.co", la aceptamos si es HTTPS
+    if (!url.startsWith('https://')) throw new Error('URL de imagen no válida');
+  }
+  
+  console.log('✅ Imagen subida (URL directa):', url);
   return url;
 }
 
-/* ========== AUTH ========== */
+/* ============ AUTH (FIX: render inmediato) ============ */
 $('btn-google-login').addEventListener('click', async () => {
-  try { await signInWithPopup(auth, provider); }
-  catch (err) { console.error(err); showToast('Error al iniciar sesión', 'error'); }
+  const btn = $('btn-google-login');
+  btn.disabled = true;
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Conectando...`;
+  try {
+    await signInWithPopup(auth, provider);
+    // Cerrar el modal inmediatamente, el onAuthStateChanged continuará
+    closeModal('modal-login');
+    showToast('✓ Sesión iniciada. Preparando tu ágora...', 'success');
+  } catch (err) {
+    console.error('Error login:', err);
+    const msg = err.code === 'auth/popup-closed-by-user' ? 'Cerraste la ventana'
+              : err.code === 'auth/popup-blocked' ? 'El navegador bloqueó la ventana emergente. Habilítala para este sitio.'
+              : err.code === 'auth/unauthorized-domain' ? 'Dominio no autorizado en Firebase'
+              : err.message || 'Error al iniciar sesión';
+    showToast(msg, 'error');
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
 });
 
 let profileUnsub = null;
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
+  console.log('🔄 Auth state changed:', user?.email || 'sin sesión');
+  
+  // IMPORTANTE: actualizar estado y renderizar INMEDIATAMENTE
+  // aunque el perfil no esté cargado aún
   state.user = user;
   state.isAdmin = !!user && user.email === ADMIN_EMAIL;
+  state.authReady = true;
+  
   if (profileUnsub) { profileUnsub(); profileUnsub = null; }
-  if (user) {
-    profileUnsub = onSnapshot(doc(db, 'users', user.uid), (snap) => {
-      state.profile = snap.exists() ? snap.data() : null;
-      if (!state.profile && !state.onboardingOpened) { state.onboardingOpened = true; openProfileModal(false); }
-      render();
-    }, (err) => { console.error('perfil:', err); showToast('Error de permisos al leer perfil. Revisa las reglas de Firestore.', 'error'); });
-  } else {
-    state.profile = null; state.onboardingOpened = false; render();
-  }
+  
+  // Renderizar YA con el estado de usuario (no esperar al perfil)
   renderUserArea();
   updateCartBadge();
+  render();
+  
+  if (user) {
+    // Intentar cargar perfil, pero NO bloquear el render si falla
+    profileUnsub = onSnapshot(
+      doc(db, 'users', user.uid),
+      (snap) => {
+        const prevProfile = state.profile;
+        state.profile = snap.exists() ? snap.data() : null;
+        // Re-renderizar solo si cambió el perfil
+        if (JSON.stringify(prevProfile) !== JSON.stringify(state.profile)) {
+          renderUserArea();
+          render();
+        }
+        // Abrir onboarding si es primera vez (y solo si el usuario no lo cerró)
+        if (!state.profile && !state.onboardingOpened) {
+          state.onboardingOpened = true;
+          setTimeout(() => openProfileModal(false), 600);
+        }
+      },
+      (err) => {
+        console.warn('No se pudo leer el perfil (quizás aún no existe):', err.code);
+        // NO mostrar toast de error: es normal cuando el usuario es nuevo
+        // El perfil no existe aún, así que abrimos el onboarding
+        if (!state.profile && !state.onboardingOpened) {
+          state.onboardingOpened = true;
+          setTimeout(() => openProfileModal(false), 600);
+        }
+      }
+    );
+  } else {
+    state.profile = null;
+    state.onboardingOpened = false;
+  }
 });
 
-async function handleLogout() { await signOut(auth); showToast('Sesión cerrada'); }
+async function handleLogout() {
+  await signOut(auth);
+  showToast('Sesión cerrada');
+}
 
 function renderUserArea() {
   const area = $('user-area');
@@ -426,11 +513,12 @@ function renderUserArea() {
     $('btn-login-nav').addEventListener('click', () => openModal('modal-login'));
     return;
   }
+  const nickname = state.profile?.nickname || state.user.displayName?.split(' ')[0] || '';
   area.innerHTML = `
     ${state.isAdmin ? `<span class="hidden sm:inline text-xs font-bold text-accent bg-accent-soft border border-accent px-3 py-1 rounded-full">ADMIN</span>` : ''}
     <button id="btn-open-profile" class="flex items-center gap-2 pl-1 pr-2 py-1 bg-surface2 rounded-full border border-app hover:border-accent transition" title="Mi perfil">
-      <img src="${state.profile?.photoURL || state.user.photoURL || ''}" class="w-7 h-7 rounded-full object-cover bg-surface2" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
-      <span class="hidden sm:inline text-sm font-medium text-main">${state.profile?.nickname || state.user.displayName?.split(' ')[0] || ''}</span>
+      <img src="${state.profile?.photoURL || state.user.photoURL || IMG_FALLBACK}" class="w-7 h-7 rounded-full object-cover bg-surface2" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
+      <span class="hidden sm:inline text-sm font-medium text-main">${nickname}</span>
     </button>
     <button id="btn-logout" class="p-2 rounded-full btn-ghost !border-0 text-muted" title="Salir">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -439,13 +527,19 @@ function renderUserArea() {
   $('btn-open-profile').addEventListener('click', () => openProfileModal(true));
 }
 
-/* ========== DATOS ========== */
+/* ============ DATOS ============ */
 const productsRef = collection(db, 'products');
 const categoriesRef = collection(db, 'categories');
-onSnapshot(productsRef, (snap) => { state.products = snap.docs.map(d => ({ id: d.id, ...d.data() })); render(); }, (e) => console.error('productos:', e));
-onSnapshot(categoriesRef, (snap) => { state.categories = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name)); render(); }, (e) => console.error('categorias:', e));
+onSnapshot(productsRef, (snap) => {
+  state.products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+}, (e) => console.error('productos:', e));
+onSnapshot(categoriesRef, (snap) => {
+  state.categories = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
+  render();
+}, (e) => console.error('categorias:', e));
 
-/* ========== GEO ========== */
+/* ============ GEO ============ */
 function haversineKm(lat1, lng1, lat2, lng2) {
   const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
@@ -462,15 +556,14 @@ function checkCoverage(lat, lng, addr = {}) {
 async function geocodeAddress(address) {
   const q = encodeURIComponent(`${address}, Argentina`);
   const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=es&q=${q}`);
-  const data = await res.json();
-  return data[0] || null;
+  return (await res.json())[0] || null;
 }
 async function reverseGeocode(lat, lng) {
   const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=es&lat=${lat}&lon=${lng}`);
   return await res.json();
 }
 
-/* ========== MAPA ========== */
+/* ============ MAPA ============ */
 let leafletMap = null, leafletMarker = null;
 function initMap(lat = -38.0, lng = -57.55, zoom = 10) {
   if (leafletMap) { leafletMap.remove(); leafletMap = null; }
@@ -506,7 +599,7 @@ function evaluateGeo(lat, lng, addr, displayName) {
   }
 }
 
-/* ========== PERFIL ========== */
+/* ============ PERFIL ============ */
 function openProfileModal(isEdit) {
   state.geoResult = null;
   state.profilePhotoUrl = state.profile?.photoURL || state.user?.photoURL || '';
@@ -588,7 +681,7 @@ $('form-profile').addEventListener('submit', async (e) => {
   } finally { btn.disabled = false; }
 });
 
-/* ========== RENDER ========== */
+/* ============ RENDER ============ */
 function render() {
   const main = $('main');
   if (!state.user) { renderHero(main); return; }
@@ -658,7 +751,6 @@ function renderBanners(parent) {
   }
 }
 
-/* ========== ADMIN ========== */
 function renderAdminPanel(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
@@ -684,7 +776,6 @@ function renderAdminPanel(parent) {
   else renderAdminOrders(content);
 }
 
-/* ---- Picker de etiquetas (reutilizable) ---- */
 function renderTagsPicker(containerId = 'tags-picker') {
   const container = $(containerId);
   if (!container) return;
@@ -708,7 +799,6 @@ async function ensureCategory(name) {
   return name;
 }
 
-/* ---- Subir producto ---- */
 function renderUploadForm(parent) {
   parent.innerHTML = `
     <form id="form-upload" class="grid sm:grid-cols-2 gap-5">
@@ -757,9 +847,9 @@ async function handleUploadProduct(e) {
   btn.disabled = true;
   try {
     if (!file || file.size === 0 || !file.type.startsWith('image/')) throw new Error('Selecciona una imagen válida');
-    status.textContent = 'Subiendo imagen...';
+    status.textContent = '📤 Subiendo imagen...';
     const imageUrl = await uploadImageToImgBB(file);
-    status.textContent = 'Guardando producto...';
+    status.textContent = '💾 Guardando producto...';
     const cats = [];
     for (const t of selectedTags) cats.push(await ensureCategory(t));
     await addDoc(productsRef, { name, description, price: Number(price), image: imageUrl, categories: cats, createdAt: serverTimestamp() });
@@ -772,7 +862,6 @@ async function handleUploadProduct(e) {
   } finally { btn.disabled = false; }
 }
 
-/* ---- Editar producto ---- */
 function openProductEdit(p) {
   editingProduct = p;
   selectedTags = new Set(p.categories || []);
@@ -799,11 +888,11 @@ $('form-product-edit').addEventListener('submit', async (e) => {
   const status = $('edit-status');
   btn.disabled = true;
   try {
-    status.textContent = 'Guardando...';
+    status.textContent = '💾 Guardando...';
     const file = $('edit-image').files[0];
     let image = editingProduct.image;
     if (file) {
-      status.textContent = 'Subiendo nueva imagen...';
+      status.textContent = '📤 Subiendo nueva imagen...';
       image = await uploadImageToImgBB(file);
     }
     const cats = [];
@@ -822,7 +911,6 @@ $('form-product-edit').addEventListener('submit', async (e) => {
   } finally { btn.disabled = false; }
 });
 
-/* ---- Gestor de etiquetas ---- */
 function renderTagsManager(parent) {
   parent.innerHTML = `
     <div class="flex flex-col sm:flex-row gap-2 mb-6">
@@ -870,7 +958,6 @@ async function deleteTag(id, name) {
   } catch (err) { showToast('Error: ' + err.message, 'error'); }
 }
 
-/* ---- Órdenes admin ---- */
 async function renderAdminOrders(parent) {
   parent.innerHTML = '<div class="py-12 text-center text-muted">Cargando órdenes...</div>';
   try {
@@ -898,7 +985,18 @@ async function renderAdminOrders(parent) {
   } catch (err) { parent.innerHTML = `<div class="py-12 text-center text-red-500">Error: ${err.message}</div>`; }
 }
 
-/* ---- Catálogo ---- */
+/* Helper: normalizar imagen (si la URL no es directa, muestra fallback) */
+function imgSrc(url) {
+  if (!url) return IMG_FALLBACK;
+  // Si es URL directa de ibb.co o cualquier https que empieza bien, la usamos
+  if (url.startsWith('https://i.ibb.co/') || url.startsWith('data:image/')) return url;
+  // Si es URL de visor (https://ibb.co/XXX sin /i.) probablemente no cargue como <img>
+  if (/^https:\/\/(www\.)?ibb\.co\/[^/]+$/.test(url)) return IMG_FALLBACK;
+  // Cualquier otra HTTPS: la probamos
+  if (url.startsWith('https://')) return url;
+  return IMG_FALLBACK;
+}
+
 function renderCatalog(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
@@ -920,7 +1018,9 @@ function renderCatalog(parent) {
         <p class="text-muted">El ágora se está llenando. Vuelve pronto.</p>
       </div>` : `
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        ${filtered.map(p => `
+        ${filtered.map(p => {
+          const src = imgSrc(p.image);
+          return `
           <article class="group bg-surface border border-app rounded-2xl overflow-hidden hover:border-accent hover:shadow-xl transition-all duration-300 relative">
             ${state.isAdmin ? `
             <div class="absolute top-3 right-3 z-10 flex gap-1.5">
@@ -932,7 +1032,7 @@ function renderCatalog(parent) {
               </button>
             </div>` : ''}
             <div class="aspect-square bg-surface2 overflow-hidden">
-              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
+              <img src="${src}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
             </div>
             <div class="p-5">
               <div class="flex items-start justify-between gap-3 mb-2">
@@ -943,7 +1043,8 @@ function renderCatalog(parent) {
               ${(p.categories || []).length ? `<div class="flex flex-wrap gap-1.5 mb-4">${p.categories.map(c => `<span class="text-xs px-2 py-0.5 rounded-full bg-accent-soft text-accent border border-accent">${c}</span>`).join('')}</div>` : '<div class="mb-4"></div>'}
               <button class="btn-add-to-cart w-full btn-ghost py-3 rounded-xl text-sm font-bold hover:!border-accent hover:!text-accent" data-id="${p.id}">Agregar al carrito</button>
             </div>
-          </article>`).join('')}
+          </article>`;
+        }).join('')}
       </div>`}`;
   parent.appendChild(section);
   section.querySelectorAll('.cat-chip').forEach(b => b.addEventListener('click', () => { state.activeCategory = b.dataset.cat; render(); }));
@@ -959,7 +1060,6 @@ function renderCatalog(parent) {
   }));
 }
 
-/* ---- Mis órdenes ---- */
 function renderMyOrders(parent) {
   const section = document.createElement('section');
   section.innerHTML = `
@@ -989,7 +1089,6 @@ function renderMyOrders(parent) {
   );
 }
 
-/* ========== CARRITO ========== */
 function addToCart(id) {
   const p = state.products.find(x => x.id === id);
   if (!p) return;
@@ -1019,7 +1118,7 @@ function renderCart() {
   }
   items.innerHTML = `<div class="space-y-4">${state.cart.map(it => `
     <div class="flex gap-3 pb-4 border-b border-app last:border-0">
-      <img src="${it.image}" class="w-16 h-16 rounded-lg object-cover bg-surface2" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
+      <img src="${imgSrc(it.image)}" class="w-16 h-16 rounded-lg object-cover bg-surface2" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
           <div class="font-medium text-sm truncate text-main">${it.name}</div>
@@ -1074,7 +1173,6 @@ $('btn-close-cart').addEventListener('click', () => closeModal('modal-cart'));
 $('cart-backdrop').addEventListener('click', () => closeModal('modal-cart'));
 $('btn-close-checkout').addEventListener('click', () => closeModal('modal-checkout'));
 
-/* ========== MERCADO PAGO ========== */
 $('btn-pay-mp').addEventListener('click', async () => {
   if (!state.user || !state.profile) return;
   const btn = $('btn-pay-mp');
@@ -1125,7 +1223,6 @@ $('btn-pay-mp').addEventListener('click', async () => {
   }
 });
 
-/* ========== SOPORTE ========== */
 function openSupport() { $('support-contact').value = state.profile?.whatsapp || ''; openModal('modal-support'); }
 $('btn-support').addEventListener('click', openSupport);
 $('btn-support-footer').addEventListener('click', openSupport);
@@ -1140,7 +1237,6 @@ $('btn-send-support').addEventListener('click', () => {
   window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
 });
 
-/* ========== INIT ========== */
 updateCartBadge();
 render();
 </script>
