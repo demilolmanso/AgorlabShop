@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Agorlab — Premium Store</title>
+<title>Agorlab — El ágora digital</title>
+
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -14,40 +16,11 @@
           sans: ['Inter', 'system-ui', 'sans-serif'],
           display: ['Space Grotesk', 'system-ui', 'sans-serif']
         },
-        colors: {
-          base: {
-            950: '#0a0a0a',
-            900: '#111111',
-            850: '#161616',
-            800: '#1c1c1c',
-            700: '#262626',
-            600: '#333333',
-            500: '#4d4d4d',
-            400: '#666666',
-            300: '#8c8c8c',
-            200: '#b3b3b3',
-            100: '#d9d9d9',
-            50:  '#f0f0f0'
-          },
-          flame: {
-            50:  '#fff7ed',
-            100: '#ffedd5',
-            200: '#fed7aa',
-            300: '#fdba74',
-            400: '#fb923c',
-            500: '#f97316',
-            600: '#ea580c',
-            700: '#c2410c',
-            800: '#9a3412',
-            900: '#7c2d12'
-          }
-        },
         animation: {
           'fade-in': 'fadeIn 0.5s ease-out',
           'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-          'slide-down': 'slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
           'glow-pulse': 'glowPulse 3s ease-in-out infinite',
-          'float': 'float 6s ease-in-out infinite',
+          'float': 'float 7s ease-in-out infinite'
         },
         keyframes: {
           fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -55,91 +28,149 @@
             '0%': { opacity: '0', transform: 'translateY(30px)' },
             '100%': { opacity: '1', transform: 'translateY(0)' }
           },
-          slideDown: {
-            '0%': { opacity: '0', transform: 'translateY(-20px)' },
-            '100%': { opacity: '1', transform: 'translateY(0)' }
-          },
-          glowPulse: {
-            '0%, 100%': { opacity: '0.4' },
-            '50%': { opacity: '0.8' }
-          },
-          float: {
-            '0%, 100%': { transform: 'translateY(0px)' },
-            '50%': { transform: 'translateY(-20px)' }
-          }
+          glowPulse: { '0%,100%': { opacity: '.45' }, '50%': { opacity: '.9' } },
+          float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-18px)' } }
         }
       }
     }
   }
 </script>
+
+<!-- Fuentes -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Leaflet (mapas) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
+  /* ============ SISTEMA DE TEMA (variables) ============ */
+  :root {
+    --bg: #f6f6f7;
+    --surface: #ffffff;
+    --surface2: #ececee;
+    --border: #e0e0e3;
+    --text: #141416;
+    --muted: #63636a;
+    --faint: #9a9aa1;
+    --accent: #ea580c;
+    --accent-hover: #c2410c;
+    --accent-soft: rgba(234, 88, 12, .10);
+    --on-accent: #ffffff;
+  }
+  .dark {
+    --bg: #0a0a0b;
+    --surface: #141416;
+    --surface2: #1e1e21;
+    --border: #2a2a2e;
+    --text: #f2f2f3;
+    --muted: #a3a3a9;
+    --faint: #6e6e75;
+    --accent: #f97316;
+    --accent-hover: #fb923c;
+    --accent-soft: rgba(249, 115, 22, .13);
+    --on-accent: #0a0a0b;
+  }
+
   html { scroll-behavior: smooth; }
-  body { 
-    font-family: 'Inter', sans-serif; 
+  body {
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: #0a0a0a;
-    color: #f0f0f0;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .3s ease, color .3s ease;
   }
   .font-display { font-family: 'Space Grotesk', sans-serif; }
-  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type="number"] { -moz-appearance: textfield; }
-  
-  /* Efecto de texto con gradiente naranja */
+
+  /* Clases semánticas de tema (se adaptan SIEMPRE) */
+  .bg-app      { background: var(--bg); }
+  .bg-surface  { background: var(--surface); }
+  .bg-surface2 { background: var(--surface2); }
+  .border-app  { border-color: var(--border); }
+  .text-main   { color: var(--text); }
+  .text-muted  { color: var(--muted); }
+  .text-faint  { color: var(--faint); }
+  .text-accent { color: var(--accent); }
+  .bg-accent   { background: var(--accent); color: var(--on-accent); }
+  .bg-accent:hover { background: var(--accent-hover); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  .border-accent { border-color: var(--accent); }
+
+  .btn-accent {
+    background: var(--accent); color: var(--on-accent);
+    transition: background .2s ease, transform .15s ease;
+  }
+  .btn-accent:hover { background: var(--accent-hover); }
+  .btn-accent:disabled { background: var(--surface2); color: var(--faint); cursor: not-allowed; }
+
+  .btn-ghost {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border);
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .btn-ghost:hover { background: var(--border); }
+
+  .input-app {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .input-app::placeholder { color: var(--faint); }
+  .input-app:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
   .text-gradient-flame {
-    background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fdba74 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  /* Efecto de glow detrás del título */
   .hero-glow {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%);
-    filter: blur(80px);
-    pointer-events: none;
+    position: absolute; width: 620px; height: 620px;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    filter: blur(80px); pointer-events: none;
   }
-  
-  /* Línea decorativa animada */
-  .accent-line {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #f97316, transparent);
-  }
+  .accent-line { height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+
+  /* Mapa oscuro en modo oscuro */
+  .dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) grayscale(.2); }
+  .leaflet-container { background: var(--surface2); font-family: 'Inter', sans-serif; }
 </style>
 </head>
-<body class="bg-base-950 text-base-50 min-h-screen">
+
+<body class="min-h-screen">
 
 <!-- ============ NAVBAR ============ -->
-<header id="navbar" class="sticky top-0 z-40 bg-base-950/80 backdrop-blur-xl border-b border-base-800">
+<header class="sticky top-0 z-40 bg-app/80 backdrop-blur-xl border-b border-app" style="background: color-mix(in srgb, var(--bg) 82%, transparent);">
   <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="#" class="font-display font-bold text-2xl tracking-tight flex items-center gap-2">
-      <span class="text-base-50">Agor</span><span class="text-flame-500">lab</span>
-      <span class="w-2 h-2 rounded-full bg-flame-500 animate-glow-pulse"></span>
+    <a href="#" class="font-display font-bold text-2xl tracking-tight flex items-center gap-2 text-main">
+      Agor<span class="text-accent">lab</span>
+      <span class="w-2 h-2 rounded-full bg-accent animate-glow-pulse"></span>
     </a>
-    <div class="flex items-center gap-2 sm:gap-4">
-      <button id="btn-theme-toggle" class="p-2 hover:bg-base-800 rounded-full transition" title="Cambiar tema">
-        <svg id="icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-        </svg>
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      <button id="btn-support" class="p-2 rounded-full btn-ghost !border-0 hover:!bg-surface2" title="Soporte">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 5.636a9 9 0 11-12.728 0M12 3v9"/></svg>
       </button>
-      <button id="btn-cart" class="relative p-2 hover:bg-base-800 rounded-full transition" title="Carrito">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <span id="cart-badge" class="absolute -top-1 -right-1 bg-flame-500 text-base-950 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">0</span>
+      <button id="btn-theme-toggle" class="p-2 rounded-full btn-ghost !border-0" title="Cambiar tema">
+        <svg id="icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <button id="btn-cart" class="relative p-2 rounded-full btn-ghost !border-0" title="Carrito">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <span id="cart-badge" class="absolute -top-1 -right-1 bg-accent text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">0</span>
       </button>
       <div id="user-area" class="flex items-center gap-2"></div>
     </div>
@@ -150,82 +181,140 @@
 <main id="main" class="max-w-7xl mx-auto px-6 py-10 min-h-[70vh]"></main>
 
 <!-- ============ FOOTER ============ -->
-<footer class="border-t border-base-800 mt-20 py-10 text-center text-sm text-base-400">
-  <div class="font-display font-semibold text-base-50 mb-1 flex items-center justify-center gap-2">
-    <span>Agor</span><span class="text-flame-500">lab</span>
-  </div>
-  <p>&copy; 2026. Diseño minimalista premium. Todos los derechos reservados.</p>
+<footer class="border-t border-app mt-20 py-10 text-center text-sm text-muted">
+  <div class="font-display font-semibold text-main mb-1">Agor<span class="text-accent">lab</span></div>
+  <p class="mb-1">El ágora digital — inspirada en la ἀγορά de la antigua Grecia.</p>
+  <p>&copy; 2026 Agorlab. <button id="btn-support-footer" class="underline text-accent">Soporte</button></p>
 </footer>
 
 <!-- ============ MODAL: LOGIN ============ -->
-<div id="modal-login" class="fixed inset-0 z-50 hidden items-center justify-center bg-base-950/90 backdrop-blur-md p-4">
-  <div class="bg-base-900 border border-base-700 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
+<div id="modal-login" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
+  <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
     <div class="text-center mb-6">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-flame-500 to-flame-700 flex items-center justify-center">
-        <svg class="w-8 h-8 text-base-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-        </svg>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center">
+        <svg class="w-8 h-8" style="color: var(--on-accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       </div>
-      <div class="font-display font-bold text-3xl mb-2">Bienvenido</div>
-      <p class="text-base-400 text-sm">Inicia sesión para acceder a la experiencia completa</p>
+      <div class="font-display font-bold text-3xl mb-2 text-main">Entrar al ágora</div>
+      <p class="text-muted text-sm">Un punto de encuentro abierto. Inicia sesión para participar del intercambio.</p>
     </div>
-    <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-base-800 hover:bg-base-700 border border-base-600 transition py-3.5 px-4 rounded-xl font-medium">
+    <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 btn-ghost py-3.5 px-4 rounded-xl font-medium">
       <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
     </button>
-    <div class="mt-6 pt-6 border-t border-base-800 text-center">
-      <p class="text-xs text-base-500">Al continuar aceptas nuestros términos y política de privacidad.</p>
-    </div>
+    <p class="text-xs text-faint text-center mt-6">Al continuar aceptas nuestros términos y política de privacidad.</p>
   </div>
 </div>
 
-<!-- ============ MODAL: CART ============ -->
+<!-- ============ MODAL: CARRITO ============ -->
 <div id="modal-cart" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-base-950/80 backdrop-blur-sm" id="cart-backdrop"></div>
-  <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-base-900 border-l border-base-800 shadow-2xl flex flex-col animate-slide-up">
-    <div class="p-6 border-b border-base-800 flex items-center justify-between">
-      <h2 class="font-display font-bold text-xl flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-flame-500"></span>
-        Tu carrito
+  <div class="absolute inset-0" id="cart-backdrop" style="background: color-mix(in srgb, var(--bg) 40%, transparent); backdrop-filter: blur(4px);"></div>
+  <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-surface border-l border-app shadow-2xl flex flex-col animate-slide-up">
+    <div class="p-6 border-b border-app flex items-center justify-between">
+      <h2 class="font-display font-bold text-xl text-main flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-accent"></span> Tu carrito
       </h2>
-      <button id="btn-close-cart" class="p-2 hover:bg-base-800 rounded-full transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
+      <button id="btn-close-cart" class="p-2 rounded-full btn-ghost !border-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-6 scrollbar-thin"></div>
-    <div id="cart-footer" class="border-t border-base-800 p-6"></div>
+    <div id="cart-footer" class="border-t border-app p-6"></div>
   </div>
 </div>
 
 <!-- ============ MODAL: CHECKOUT ============ -->
-<div id="modal-checkout" class="fixed inset-0 z-50 hidden items-center justify-center bg-base-950/90 backdrop-blur-md p-4">
-  <div class="bg-base-900 border border-base-700 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="font-display font-bold text-xl flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-flame-500"></span>
-        Envío
-      </h2>
-      <button id="btn-close-checkout" class="p-2 hover:bg-base-800 rounded-full transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
+<div id="modal-checkout" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
+  <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-display font-bold text-xl text-main flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-accent"></span> Confirmar compra</h2>
+      <button id="btn-close-checkout" class="p-2 rounded-full btn-ghost !border-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <p class="text-sm text-base-400 mb-4">Ingresa tu código postal para calcular el costo y disponibilidad del envío.</p>
-    <input id="input-zip" type="text" inputmode="numeric" maxlength="4" placeholder="Ej: 7600" class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 text-lg tracking-widest font-medium mb-2 placeholder:text-base-600"/>
-    <div id="zip-message" class="text-sm min-h-[20px] mb-4"></div>
-    <button id="btn-pay-mp" class="w-full bg-flame-600 hover:bg-flame-500 text-base-950 font-bold py-3.5 rounded-xl transition disabled:bg-base-700 disabled:text-base-500 disabled:cursor-not-allowed" disabled>
-      Pagar con Mercado Pago
-    </button>
+    <div id="checkout-summary" class="text-sm space-y-2 mb-5"></div>
+    <button id="btn-pay-mp" class="w-full btn-accent font-bold py-3.5 rounded-xl">Pagar con Mercado Pago</button>
+    <p class="text-xs text-faint text-center mt-3">Tu orden quedará registrada antes de redirigirte al pago.</p>
+  </div>
+</div>
+
+<!-- ============ MODAL: PERFIL / ONBOARDING ============ -->
+<div id="modal-profile" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
+  <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-slide-up my-8">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="font-display font-bold text-2xl text-main" id="profile-title">Crea tu perfil</h2>
+      <button id="btn-close-profile" class="p-2 rounded-full btn-ghost !border-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-sm text-muted mb-6">Tu perfil de ciudadano del ágora: cómo te llamamos, dónde te encontramos y dónde entregamos.</p>
+
+    <form id="form-profile" class="grid sm:grid-cols-2 gap-5">
+      <!-- Foto -->
+      <div class="sm:col-span-2 flex items-center gap-4">
+        <img id="profile-photo-preview" src="" alt="" class="w-16 h-16 rounded-full object-cover border-2 border-app bg-surface2"/>
+        <div class="flex-1">
+          <label class="text-sm font-medium text-muted block mb-1.5">Foto de perfil (opcional)</label>
+          <input id="profile-photo-input" type="file" accept="image/*" class="w-full input-app rounded-xl px-4 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-accent file:text-sm file:font-semibold file:cursor-pointer cursor-pointer" style="--tw-text-opacity:1; color: var(--text);"/>
+        </div>
+      </div>
+      <!-- Apodo -->
+      <div>
+        <label class="text-sm font-medium text-muted block mb-1.5">Apodo *</label>
+        <input id="profile-nickname" required minlength="3" maxlength="20" class="w-full input-app rounded-xl px-4 py-3" placeholder="Ej: demian"/>
+        <p class="text-xs text-faint mt-1">Lo usaremos para tu futuro correo <span class="text-accent">@agorlab.com</span></p>
+      </div>
+      <!-- WhatsApp -->
+      <div>
+        <label class="text-sm font-medium text-muted block mb-1.5">WhatsApp *</label>
+        <input id="profile-whatsapp" required class="w-full input-app rounded-xl px-4 py-3" placeholder="Ej: 223 555 5555"/>
+      </div>
+      <!-- Dirección -->
+      <div class="sm:col-span-2">
+        <label class="text-sm font-medium text-muted block mb-1.5">Dirección de entrega *</label>
+        <div class="flex gap-2">
+          <input id="profile-address" required class="flex-1 input-app rounded-xl px-4 py-3" placeholder="Calle, número, ciudad"/>
+          <button type="button" id="btn-verify-address" class="btn-ghost px-4 py-3 rounded-xl font-semibold whitespace-nowrap">Verificar en mapa</button>
+        </div>
+      </div>
+      <!-- Mapa -->
+      <div class="sm:col-span-2">
+        <div id="profile-map" class="h-64 rounded-xl border border-app overflow-hidden z-0"></div>
+        <div id="map-message" class="text-sm mt-2 min-h-[22px]"></div>
+        <p class="text-xs text-faint mt-1">Cobertura actual: <span class="text-accent font-medium">Mar del Plata, Santa Clara del Mar y Miramar</span>. Puedes hacer click en el mapa para ajustar la ubicación exacta.</p>
+      </div>
+      <div class="sm:col-span-2 flex justify-end gap-3 mt-2">
+        <button type="button" id="btn-profile-cancel" class="btn-ghost px-6 py-3 rounded-xl font-semibold">Cancelar</button>
+        <button type="submit" id="btn-profile-save" class="btn-accent px-8 py-3 rounded-xl font-bold" disabled>Confirmar ubicación y guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: SOPORTE ============ -->
+<div id="modal-support" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
+  <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-bold text-xl text-main flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-accent"></span> Soporte</h2>
+      <button id="btn-close-support" class="p-2 rounded-full btn-ghost !border-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-sm text-muted mb-4">Escríbenos a <span class="text-accent font-semibold">contacto@agorlab.com</span>. Respondemos todas las consultas del ágora.</p>
+    <div class="bg-accent-soft border border-accent rounded-xl p-3 mb-4 text-sm" style="color: var(--text);">
+      ⚠️ <strong>Importante:</strong> debes incluir un <strong>contacto telefónico / WhatsApp</strong> en tu mensaje para poder recibir una respuesta.
+    </div>
+    <label class="text-sm font-medium text-muted block mb-1.5">Tu mensaje</label>
+    <textarea id="support-message" rows="4" class="w-full input-app rounded-xl px-4 py-3 mb-3" placeholder="Describe tu consulta..."></textarea>
+    <label class="text-sm font-medium text-muted block mb-1.5">Tu teléfono / WhatsApp *</label>
+    <input id="support-contact" class="w-full input-app rounded-xl px-4 py-3 mb-4" placeholder="Ej: 223 555 5555"/>
+    <button id="btn-send-support" class="w-full btn-accent font-bold py-3 rounded-xl">Abrir correo electrónico</button>
   </div>
 </div>
 
 <!-- ============ TOAST ============ -->
 <div id="toast" class="fixed bottom-6 right-6 z-[100] hidden px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up"></div>
 
-<!-- ============ FIREBASE & APP LOGIC ============ -->
+<!-- ============ FIREBASE ============ -->
 <script type="importmap">
 {
   "imports": {
@@ -238,14 +327,13 @@
 
 <script type="module">
 import { initializeApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-} from 'firebase/auth';
-import {
-  getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, getDocs
+  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
+  onSnapshot, query, where, orderBy, serverTimestamp, getDocs
 } from 'firebase/firestore';
 
-// ============ CONFIG ============
+/* ================= CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCkhVbKYq1hpwsGv6RQCc2aZndIHypMFgI",
   authDomain: "agorlab-55cf1.firebaseapp.com",
@@ -254,7 +342,6 @@ const firebaseConfig = {
   messagingSenderId: "619711014107",
   appId: "1:619711014107:web:99e77ce286ddb9c91098fe"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -263,325 +350,496 @@ const provider = new GoogleAuthProvider();
 const ADMIN_EMAIL = "cepedademian2005@gmail.com";
 const MP_ACCESS_TOKEN = "APP_USR-2955434807999492-091915-855e6dc48a84e7b02a51fb8a9425c966-323912180";
 const IMGBB_API_KEY = "ddf97f646af43fb4a9ef9a58262698ba";
-const VALID_ZIPS = ["7600", "7620", "7607"];
+const SUPPORT_EMAIL = "contacto@agorlab.com";
 
-// ============ STATE ============
+/* Zonas de cobertura (centro + radio en km) */
+const COVERAGE_ZONES = [
+  { name: 'Mar del Plata',      lat: -38.0023, lng: -57.5575, radiusKm: 20 },
+  { name: 'Santa Clara del Mar',lat: -37.8269, lng: -57.5546, radiusKm: 10 },
+  { name: 'Miramar',            lat: -38.2700, lng: -57.8400, radiusKm: 12 }
+];
+
+/* ================= STATE ================= */
 const state = {
   user: null,
   isAdmin: false,
+  profile: null,
   products: [],
+  categories: [],
   cart: JSON.parse(localStorage.getItem('agorlab_cart') || '[]'),
   adminTab: 'upload',
-  hasVisited: localStorage.getItem('agorlab_visited') === 'true'
+  activeCategory: 'all',
+  geoResult: null,          // { lat, lng, zone, displayName }
+  profilePhotoUrl: '',
+  onboardingOpened: false
 };
 
-// ============ UTILS ============
+/* ================= UTILS ================= */
 const $ = (id) => document.getElementById(id);
 const saveCart = () => localStorage.setItem('agorlab_cart', JSON.stringify(state.cart));
 const fmtMoney = (n) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n || 0);
 
+const IMG_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#1e1e21"/><text x="50%" y="50%" fill="#8a8a90" font-family="sans-serif" font-size="20" text-anchor="middle">Agorlab</text></svg>'
+);
+
 function showToast(msg, type = 'info') {
   const t = $('toast');
   t.textContent = msg;
-  t.className = `fixed bottom-6 right-6 z-[100] px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up ${
-    type === 'error' ? 'bg-red-600 text-white' : 
-    type === 'success' ? 'bg-flame-600 text-base-950' : 
-    'bg-base-800 text-base-50 border border-base-700'
-  }`;
+  t.style.background = type === 'error' ? '#dc2626' : type === 'success' ? 'var(--accent)' : 'var(--surface2)';
+  t.style.color = type === 'error' ? '#fff' : type === 'success' ? 'var(--on-accent)' : 'var(--text)';
+  t.style.border = type === 'info' ? '1px solid var(--border)' : 'none';
   t.classList.remove('hidden');
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.add('hidden'), 3500);
+  t._timer = setTimeout(() => t.classList.add('hidden'), 3800);
 }
+const openModal = (id) => { const m = $(id); m.classList.remove('hidden'); m.classList.add('flex'); };
+const closeModal = (id) => { const m = $(id); m.classList.add('hidden'); m.classList.remove('flex'); };
 
-function openModal(id) {
-  const m = $(id);
-  m.classList.remove('hidden');
-  m.classList.add('flex');
+/* ================= TEMA ================= */
+function applyTheme(theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  $('icon-sun').classList.toggle('hidden', theme === 'dark');
+  $('icon-moon').classList.toggle('hidden', theme !== 'dark');
 }
-function closeModal(id) {
-  const m = $(id);
-  m.classList.add('hidden');
-  m.classList.remove('flex');
-}
-
-// ============ THEME TOGGLE ============
-function initTheme() {
-  const savedTheme = localStorage.getItem('agorlab_theme') || 'dark';
-  document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-  updateThemeIcons(savedTheme);
-}
-
-function updateThemeIcons(theme) {
-  const isDark = theme === 'dark';
-  $('icon-sun').classList.toggle('hidden', isDark);
-  $('icon-moon').classList.toggle('hidden', !isDark);
-}
-
+applyTheme(localStorage.getItem('agorlab_theme') || 'dark');
 $('btn-theme-toggle').addEventListener('click', () => {
-  const html = document.documentElement;
-  const isDark = html.classList.contains('dark');
-  html.classList.toggle('dark');
-  const newTheme = isDark ? 'light' : 'dark';
-  localStorage.setItem('agorlab_theme', newTheme);
-  updateThemeIcons(newTheme);
-  
-  // Ajustar colores del body para tema claro
-  if (!isDark) {
-    document.body.className = 'bg-base-50 text-base-900 min-h-screen';
-  } else {
-    document.body.className = 'bg-base-950 text-base-50 min-h-screen';
-  }
+  const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+  localStorage.setItem('agorlab_theme', next);
+  applyTheme(next);
 });
 
-// ============ AUTH ============
+/* ================= IMGBB (imágenes) ================= */
+async function uploadImageToImgBB(file) {
+  // Convertir a base64 (más confiable que enviar el File directo)
+  const b64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  const fd = new FormData();
+  fd.append('image', b64);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: fd });
+  if (!res.ok) throw new Error('ImgBB rechazó la subida');
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Error de ImgBB');
+  // URL DIRECTA de la imagen (no la página visor)
+  return json.data?.image?.url || json.data?.display_url || json.data?.url;
+}
+
+/* ================= AUTH ================= */
 $('btn-google-login').addEventListener('click', async () => {
   try {
-    $('btn-google-login').disabled = true;
-    $('btn-google-login').innerHTML = `
-      <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Conectando...`;
     await signInWithPopup(auth, provider);
-    localStorage.setItem('agorlab_visited', 'true');
-    state.hasVisited = true;
   } catch (err) {
     console.error(err);
     showToast('Error al iniciar sesión', 'error');
-    $('btn-google-login').disabled = false;
-    resetGoogleButton();
   }
 });
 
-function resetGoogleButton() {
-  $('btn-google-login').innerHTML = `
-    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-    Continuar con Google`;
-}
-
-async function handleLogout() {
-  try {
-    await signOut(auth);
-    showToast('Sesión cerrada');
-  } catch (err) {
-    console.error(err);
-  }
-}
-
+let profileUnsub = null;
 onAuthStateChanged(auth, (user) => {
   state.user = user;
   state.isAdmin = !!user && user.email === ADMIN_EMAIL;
-  
-  if (!user && !state.hasVisited) {
-    // Primera visita: mostrar hero
-    renderHero();
-  } else if (!user) {
-    // Ya visitó pero no está logueado: mostrar login
-    openModal('modal-login');
-    renderHero();
+  if (profileUnsub) { profileUnsub(); profileUnsub = null; }
+
+  if (user) {
+    profileUnsub = onSnapshot(doc(db, 'users', user.uid), (snap) => {
+      state.profile = snap.exists() ? snap.data() : null;
+      if (user && !state.profile && !state.onboardingOpened) {
+        state.onboardingOpened = true;
+        openProfileModal(false);
+      }
+      render();
+    });
   } else {
-    closeModal('modal-login');
-    renderMain();
+    state.profile = null;
+    state.onboardingOpened = false;
+    render();
   }
-  
   renderUserArea();
   updateCartBadge();
 });
 
+async function handleLogout() {
+  await signOut(auth);
+  showToast('Sesión cerrada');
+}
+
 function renderUserArea() {
   const area = $('user-area');
   if (!state.user) {
-    area.innerHTML = '';
+    area.innerHTML = `<button id="btn-login-nav" class="btn-accent px-4 py-2 rounded-xl text-sm font-bold">Ingresar</button>`;
+    $('btn-login-nav').addEventListener('click', () => openModal('modal-login'));
     return;
   }
   area.innerHTML = `
-    ${state.isAdmin ? `<span class="hidden sm:inline text-xs font-bold text-flame-400 bg-flame-500/10 border border-flame-500/30 px-3 py-1 rounded-full">ADMIN</span>` : ''}
-    <div class="flex items-center gap-2 pl-2 pr-1 py-1 bg-base-800 rounded-full border border-base-700">
-      <img src="${state.user.photoURL || ''}" alt="" class="w-7 h-7 rounded-full border-2 border-base-600 shadow" onerror="this.style.display='none'"/>
-      <button id="btn-logout" class="p-1.5 hover:bg-base-700 rounded-full transition text-base-400 hover:text-flame-500" title="Salir">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-        </svg>
-      </button>
-    </div>
-  `;
+    ${state.isAdmin ? `<span class="hidden sm:inline text-xs font-bold text-accent bg-accent-soft border border-accent px-3 py-1 rounded-full">ADMIN</span>` : ''}
+    <button id="btn-open-profile" class="flex items-center gap-2 pl-1 pr-2 py-1 bg-surface2 rounded-full border border-app hover:border-accent transition" title="Mi perfil">
+      <img src="${state.profile?.photoURL || state.user.photoURL || ''}" class="w-7 h-7 rounded-full object-cover bg-surface2" onerror="this.src='${IMG_FALLBACK}'"/>
+      <span class="hidden sm:inline text-sm font-medium text-main">${state.profile?.nickname || state.user.displayName?.split(' ')[0] || ''}</span>
+    </button>
+    <button id="btn-logout" class="p-2 rounded-full btn-ghost !border-0 text-muted" title="Salir">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    </button>`;
   $('btn-logout').addEventListener('click', handleLogout);
+  $('btn-open-profile').addEventListener('click', () => openProfileModal(true));
 }
 
-// ============ HERO / BIENVENIDA ============
-function renderHero() {
-  const main = $('main');
-  main.innerHTML = `
-    <div class="relative min-h-[70vh] flex flex-col items-center justify-center text-center overflow-hidden">
-      <!-- Glow effect -->
-      <div class="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-glow-pulse"></div>
-      
-      <!-- Contenido -->
-      <div class="relative z-10 max-w-4xl mx-auto animate-slide-up">
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 bg-base-900 border border-base-700 rounded-full px-4 py-2 mb-8">
-          <span class="w-2 h-2 rounded-full bg-flame-500 animate-glow-pulse"></span>
-          <span class="text-sm font-medium text-base-300">Premium Store</span>
-        </div>
-        
-        <!-- Título principal -->
-        <h1 class="font-display font-bold text-6xl sm:text-8xl lg:text-9xl tracking-tight mb-6">
-          <span class="text-base-50">Agor</span><span class="text-gradient-flame">lab</span>
-        </h1>
-        
-        <!-- Línea decorativa -->
-        <div class="accent-line w-32 mx-auto mb-8"></div>
-        
-        <!-- Subtítulo -->
-        <p class="text-xl sm:text-2xl text-base-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-          Curamos productos excepcionales para personas que aprecian el detalle.
-          <span class="text-flame-400 font-medium">Diseño minimalista, calidad premium.</span>
-        </p>
-        
-        <!-- Botones de acción -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button id="btn-enter-store" class="group bg-flame-600 hover:bg-flame-500 text-base-950 font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-flame-500/25 flex items-center gap-3">
-            Explorar tienda
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </button>
-          <button id="btn-view-catalog" class="bg-base-800 hover:bg-base-700 border border-base-700 text-base-200 font-medium px-8 py-4 rounded-xl text-lg transition">
-            Ver catálogo
-          </button>
-        </div>
-        
-        <!-- Stats -->
-        <div class="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-          <div class="text-center">
-            <div class="font-display font-bold text-3xl text-flame-500">100+</div>
-            <div class="text-sm text-base-500 mt-1">Productos</div>
-          </div>
-          <div class="text-center">
-            <div class="font-display font-bold text-3xl text-flame-500">24h</div>
-            <div class="text-sm text-base-500 mt-1">Envío Express</div>
-          </div>
-          <div class="text-center">
-            <div class="font-display font-bold text-3xl text-flame-500">5★</div>
-            <div class="text-sm text-base-500 mt-1">Calificación</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Elementos decorativos flotantes -->
-      <div class="absolute top-20 left-10 w-20 h-20 bg-flame-500/10 rounded-2xl rotate-12 animate-float" style="animation-delay: 0s;"></div>
-      <div class="absolute bottom-32 right-16 w-16 h-16 bg-flame-500/10 rounded-full animate-float" style="animation-delay: 2s;"></div>
-      <div class="absolute top-1/3 right-1/4 w-12 h-12 bg-base-800 rounded-xl rotate-45 animate-float" style="animation-delay: 4s;"></div>
-    </div>
-  `;
-  
-  $('btn-enter-store').addEventListener('click', () => {
-    if (!state.user) {
-      openModal('modal-login');
-    } else {
-      renderMain();
-    }
-  });
-  
-  $('btn-view-catalog').addEventListener('click', () => {
-    if (!state.user) {
-      openModal('modal-login');
-    } else {
-      renderMain();
-      document.querySelector('#main')?.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-}
-
-// ============ PRODUCTS (Firestore realtime) ============
+/* ================= DATOS (Firestore) ================= */
 const productsRef = collection(db, 'products');
+const categoriesRef = collection(db, 'categories');
+
 onSnapshot(productsRef, (snap) => {
   state.products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  if (state.user) renderMain();
-}, (err) => {
-  console.error('Error productos:', err);
+  render();
+}, (e) => console.error('productos:', e));
+
+onSnapshot(categoriesRef, (snap) => {
+  state.categories = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
+  render();
+}, (e) => console.error('categorias:', e));
+
+/* ================= GEO / COBERTURA ================= */
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function checkCoverage(lat, lng, addr = {}) {
+  const names = [addr.city, addr.town, addr.village, addr.municipality, addr.suburb].filter(Boolean).join(' ').toLowerCase();
+  for (const z of COVERAGE_ZONES) {
+    if (names.includes(z.name.toLowerCase())) return z;
+    if (haversineKm(lat, lng, z.lat, z.lng) <= z.radiusKm) return z;
+  }
+  return null;
+}
+async function geocodeAddress(address) {
+  const q = encodeURIComponent(`${address}, Argentina`);
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=es&q=${q}`);
+  const data = await res.json();
+  return data[0] || null;
+}
+async function reverseGeocode(lat, lng) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=es&lat=${lat}&lon=${lng}`);
+  return await res.json();
+}
+
+/* ================= MAPA (Leaflet) ================= */
+let leafletMap = null, leafletMarker = null;
+function initMap(lat = -38.0, lng = -57.55, zoom = 10) {
+  if (leafletMap) { leafletMap.remove(); leafletMap = null; }
+  leafletMap = L.map('profile-map').setView([lat, lng], zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(leafletMap);
+  leafletMarker = L.marker([lat, lng]).addTo(leafletMap);
+  leafletMap.on('click', async (e) => {
+    leafletMarker.setLatLng(e.latlng);
+    setGeoMessage('Ajustando ubicación...', 'muted');
+    try {
+      const rev = await reverseGeocode(e.latlng.lat, e.latlng.lng);
+      evaluateGeo(e.latlng.lat, e.latlng.lng, rev.address || {}, rev.display_name || '');
+    } catch { evaluateGeo(e.latlng.lat, e.latlng.lng, {}, ''); }
+  });
+}
+function setGeoMessage(html, tone) {
+  const el = $('map-message');
+  el.innerHTML = html;
+  el.style.color = tone === 'ok' ? '#16a34a' : tone === 'bad' ? '#dc2626' : 'var(--muted)';
+}
+function evaluateGeo(lat, lng, addr, displayName) {
+  const zone = checkCoverage(lat, lng, addr);
+  if (zone) {
+    state.geoResult = { lat, lng, zone: zone.name, status: 'covered', displayName };
+    setGeoMessage(`✓ Ubicación confirmada en <strong>${zone.name}</strong>. Envío disponible.`, 'ok');
+    $('btn-profile-save').disabled = false;
+    $('btn-profile-save').textContent = 'Confirmar ubicación y guardar';
+  } else {
+    state.geoResult = { lat, lng, zone: null, status: 'waitlist', displayName };
+    setGeoMessage(`✗ Esta ubicación está fuera de nuestra cobertura actual. Serás agregado a la <strong>lista de espera</strong> de tu zona.`, 'bad');
+    $('btn-profile-save').disabled = false;
+    $('btn-profile-save').textContent = 'Unirme a lista de espera y guardar';
+  }
+}
+
+/* ================= MODAL PERFIL ================= */
+function openProfileModal(isEdit) {
+  state.geoResult = null;
+  state.profilePhotoUrl = state.profile?.photoURL || state.user?.photoURL || '';
+  $('profile-photo-preview').src = state.profilePhotoUrl || IMG_FALLBACK;
+  $('profile-nickname').value = state.profile?.nickname || '';
+  $('profile-whatsapp').value = state.profile?.whatsapp || '';
+  $('profile-address').value = state.profile?.address || '';
+  $('profile-title').textContent = isEdit && state.profile ? 'Edita tu perfil' : 'Crea tu perfil';
+  $('btn-profile-save').disabled = true;
+  $('btn-profile-save').textContent = 'Confirmar ubicación y guardar';
+  setGeoMessage(state.profile?.location ? `Ubicación guardada: <strong>${state.profile.city}</strong> (${state.profile.zone === 'covered' ? 'con envío' : 'lista de espera'}). Verifica nuevamente si cambias tu dirección.` : 'Verifica tu dirección para verla en el mapa.', 'muted');
+  if (state.profile?.location) {
+    state.geoResult = { ...state.profile.location, zone: state.profile.zone === 'covered' ? state.profile.city : null, status: state.profile.zone };
+    $('btn-profile-save').disabled = false;
+    $('btn-profile-save').textContent = state.profile.zone === 'covered' ? 'Confirmar ubicación y guardar' : 'Unirme a lista de espera y guardar';
+  }
+  openModal('modal-profile');
+  setTimeout(() => {
+    initMap(state.profile?.location?.lat || -38.0, state.profile?.location?.lng || -57.55, state.profile?.location ? 14 : 10);
+    if (state.profile?.location) leafletMarker.setLatLng([state.profile.location.lat, state.profile.location.lng]);
+  }, 150);
+}
+
+$('btn-close-profile').addEventListener('click', () => closeModal('modal-profile'));
+$('btn-profile-cancel').addEventListener('click', () => closeModal('modal-profile'));
+
+$('profile-photo-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    showToast('Subiendo foto...');
+    state.profilePhotoUrl = await uploadImageToImgBB(file);
+    $('profile-photo-preview').src = state.profilePhotoUrl;
+  } catch (err) { showToast('Error al subir foto: ' + err.message, 'error'); }
 });
 
-// ============ RENDER: MAIN ============
-function renderMain() {
-  const main = $('main');
-  if (!state.user) {
-    renderHero();
-    return;
+$('btn-verify-address').addEventListener('click', async () => {
+  const address = $('profile-address').value.trim();
+  if (!address) { showToast('Escribe tu dirección primero', 'error'); return; }
+  const btn = $('btn-verify-address');
+  btn.disabled = true; btn.textContent = 'Buscando...';
+  try {
+    const result = await geocodeAddress(address);
+    if (!result) {
+      setGeoMessage('✗ No encontramos esa dirección. Prueba con más detalle (calle, número, ciudad).', 'bad');
+      state.geoResult = null;
+      $('btn-profile-save').disabled = true;
+      return;
+    }
+    const lat = parseFloat(result.lat), lng = parseFloat(result.lon);
+    leafletMarker.setLatLng([lat, lng]);
+    leafletMap.setView([lat, lng], 15);
+    evaluateGeo(lat, lng, result.address || {}, result.display_name || '');
+  } catch (err) {
+    setGeoMessage('✗ Error al consultar el mapa. Intenta de nuevo.', 'bad');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Verificar en mapa';
   }
+});
+
+$('form-profile').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!state.geoResult) { showToast('Primero verifica tu dirección en el mapa', 'error'); return; }
+  const nickname = $('profile-nickname').value.trim();
+  const whatsapp = $('profile-whatsapp').value.trim();
+  const address = $('profile-address').value.trim();
+  if (!/^[0-9+()\-\s]{6,20}$/.test(whatsapp)) { showToast('WhatsApp inválido', 'error'); return; }
+
+  try {
+    await setDoc(doc(db, 'users', state.user.uid), {
+      uid: state.user.uid,
+      email: state.user.email,
+      name: state.user.displayName,
+      nickname,
+      whatsapp,
+      address,
+      photoURL: state.profilePhotoUrl,
+      location: { lat: state.geoResult.lat, lng: state.geoResult.lng },
+      city: state.geoResult.zone || (state.geoResult.displayName || 'Zona sin cobertura'),
+      zone: state.geoResult.status,   // 'covered' | 'waitlist'
+      updatedAt: serverTimestamp(),
+      ...(state.profile?.createdAt ? { createdAt: state.profile.createdAt } : { createdAt: serverTimestamp() })
+    }, { merge: true });
+
+    closeModal('modal-profile');
+    showToast(state.geoResult.status === 'covered'
+      ? '✓ Perfil guardado. ¡Bienvenido al ágora!'
+      : 'Perfil guardado. Estás en lista de espera para tu zona.', state.geoResult.status === 'covered' ? 'success' : 'info');
+  } catch (err) {
+    console.error(err);
+    showToast('Error al guardar perfil: ' + err.message, 'error');
+  }
+});
+
+/* ================= RENDER PRINCIPAL ================= */
+function render() {
+  const main = $('main');
+  if (!state.user) { renderHero(main); return; }
   main.innerHTML = '';
+  renderBanners(main);
   if (state.isAdmin) renderAdminPanel(main);
   renderCatalog(main);
   renderMyOrders(main);
 }
 
-// ============ RENDER: ADMIN PANEL ============
+/* ---- HERO / BIENVENIDA (identidad ágora) ---- */
+function renderHero(main) {
+  main.innerHTML = `
+    <div class="relative min-h-[75vh] flex flex-col items-center justify-center text-center overflow-hidden">
+      <div class="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-glow-pulse"></div>
+      <div class="absolute top-24 left-10 w-20 h-20 bg-accent-soft rounded-2xl rotate-12 animate-float"></div>
+      <div class="absolute bottom-32 right-16 w-16 h-16 bg-accent-soft rounded-full animate-float" style="animation-delay:2s"></div>
+      <div class="absolute top-1/3 right-1/4 w-12 h-12 bg-surface2 rounded-xl rotate-45 animate-float" style="animation-delay:4s"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto animate-slide-up px-4">
+        <div class="inline-flex items-center gap-2 bg-surface border border-app rounded-full px-4 py-2 mb-8">
+          <span class="w-2 h-2 rounded-full bg-accent animate-glow-pulse"></span>
+          <span class="text-sm font-medium text-muted">El punto de encuentro del intercambio</span>
+        </div>
+
+        <h1 class="font-display font-bold text-6xl sm:text-8xl lg:text-9xl tracking-tight mb-6 text-main">
+          Agor<span class="text-gradient-flame">lab</span>
+        </h1>
+        <div class="accent-line w-32 mx-auto mb-8"></div>
+        <p class="text-xl sm:text-2xl text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+          Un <span class="text-accent font-semibold">ágora digital</span>: el lugar abierto donde las personas
+          se encuentran, intercambian y deciden qué circula.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <button id="btn-enter" class="btn-accent font-bold px-8 py-4 rounded-xl text-lg flex items-center gap-3 shadow-lg">
+            Entrar al ágora
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </button>
+          <a href="#dato-agora" class="btn-ghost px-8 py-4 rounded-xl text-lg font-semibold">¿Qué es el ágora?</a>
+        </div>
+
+        <!-- Dato curioso -->
+        <div id="dato-agora" class="bg-surface border border-app rounded-2xl p-8 max-w-2xl mx-auto text-left">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-3xl">🏛️</span>
+            <h3 class="font-display font-bold text-xl text-main">El ágora original</h3>
+          </div>
+          <p class="text-muted leading-relaxed mb-3">
+            En la antigua Grecia, el <strong class="text-main">ágora</strong> (ἀγορά) era la plaza pública en el corazón
+            de la polis. Allí se comerciaban bienes, se compartían ideas y se decidía el futuro de la comunidad.
+            No era solo un mercado: era el <span class="text-accent font-medium">punto de encuentro</span> donde la ciudad sucedía.
+          </p>
+          <p class="text-muted leading-relaxed">
+            Agorlab toma ese espíritu y lo trae al presente: una plaza abierta y digital
+            donde el intercambio vuelve a ser encuentro.
+          </p>
+        </div>
+
+        <div class="mt-14 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          <div><div class="font-display font-bold text-3xl text-accent">3</div><div class="text-sm text-faint mt-1">ciudades con envío</div></div>
+          <div><div class="font-display font-bold text-3xl text-accent">24/7</div><div class="text-sm text-faint mt-1">ágora abierta</div></div>
+          <div><div class="font-display font-bold text-3xl text-accent">1</div><div class="text-sm text-faint mt-1">punto de encuentro</div></div>
+        </div>
+      </div>
+    </div>`;
+  $('btn-enter').addEventListener('click', () => openModal('modal-login'));
+}
+
+/* ---- BANNERS (perfil / lista de espera) ---- */
+function renderBanners(parent) {
+  if (!state.profile) {
+    parent.insertAdjacentHTML('beforeend', `
+      <div class="bg-accent-soft border border-accent rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p class="text-sm text-main">📋 <strong>Completa tu perfil</strong> (foto, apodo, WhatsApp y dirección) para habilitar tus compras.</p>
+        <button id="btn-banner-profile" class="btn-accent px-5 py-2 rounded-xl text-sm font-bold whitespace-nowrap">Completar perfil</button>
+      </div>`);
+    $('btn-banner-profile').addEventListener('click', () => openProfileModal(false));
+  } else if (state.profile.zone === 'waitlist') {
+    parent.insertAdjacentHTML('beforeend', `
+      <div class="bg-accent-soft border border-accent rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p class="text-sm text-main">⏳ Estás en <strong>lista de espera</strong>: aún no hacemos envíos a <strong>${state.profile.city}</strong>. Te avisaremos cuando tu zona esté habilitada.</p>
+        <button id="btn-banner-edit" class="btn-ghost px-5 py-2 rounded-xl text-sm font-bold whitespace-nowrap">Cambiar dirección</button>
+      </div>`);
+    $('btn-banner-edit').addEventListener('click', () => openProfileModal(true));
+  }
+}
+
+/* ---- PANEL ADMIN ---- */
 function renderAdminPanel(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
   section.innerHTML = `
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
       <div>
-        <h2 class="font-display font-bold text-3xl flex items-center gap-3">
-          <span class="w-3 h-3 rounded-full bg-flame-500 animate-glow-pulse"></span>
-          Panel de Administración
+        <h2 class="font-display font-bold text-3xl text-main flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-accent animate-glow-pulse"></span> Panel de Administración
         </h2>
-        <p class="text-base-400 mt-1">Gestiona productos y órdenes de la tienda.</p>
+        <p class="text-muted mt-1">Gestiona el ágora: productos, etiquetas y órdenes.</p>
       </div>
-      <div class="flex bg-base-900 border border-base-800 rounded-full p-1">
-        <button data-tab="upload" class="admin-tab px-5 py-2 rounded-full text-sm font-medium transition ${state.adminTab === 'upload' ? 'bg-flame-600 text-base-950' : 'text-base-400 hover:text-base-200'}">
-          Subir producto
-        </button>
-        <button data-tab="orders" class="admin-tab px-5 py-2 rounded-full text-sm font-medium transition ${state.adminTab === 'orders' ? 'bg-flame-600 text-base-950' : 'text-base-400 hover:text-base-200'}">
-          Órdenes
-        </button>
+      <div class="flex bg-surface border border-app rounded-full p-1">
+        ${['upload', 'tags', 'orders'].map(t => `
+          <button data-tab="${t}" class="admin-tab px-5 py-2 rounded-full text-sm font-semibold transition ${state.adminTab === t ? 'bg-accent' : 'text-muted hover:text-main'}">
+            ${t === 'upload' ? 'Subir producto' : t === 'tags' ? 'Etiquetas' : 'Órdenes'}
+          </button>`).join('')}
       </div>
     </div>
-    <div id="admin-content" class="bg-base-900 border border-base-800 rounded-2xl p-6 sm:p-8"></div>
-  `;
+    <div id="admin-content" class="bg-surface border border-app rounded-2xl p-6 sm:p-8"></div>`;
   parent.appendChild(section);
-
-  section.querySelectorAll('.admin-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.adminTab = btn.dataset.tab;
-      renderMain();
-    });
-  });
-
+  section.querySelectorAll('.admin-tab').forEach(b => b.addEventListener('click', () => { state.adminTab = b.dataset.tab; render(); }));
   const content = section.querySelector('#admin-content');
   if (state.adminTab === 'upload') renderUploadForm(content);
+  else if (state.adminTab === 'tags') renderTagsManager(content);
   else renderAdminOrders(content);
 }
 
+/* ---- FORM SUBIR PRODUCTO (con etiquetas) ---- */
+let selectedTags = new Set();
 function renderUploadForm(parent) {
   parent.innerHTML = `
     <form id="form-upload" class="grid sm:grid-cols-2 gap-5">
       <div class="sm:col-span-2">
-        <label class="text-sm font-medium text-base-300 block mb-1.5">Nombre del producto</label>
-        <input name="name" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="Ej: Auriculares Pro"/>
+        <label class="text-sm font-medium text-muted block mb-1.5">Nombre del producto</label>
+        <input name="name" required class="w-full input-app rounded-xl px-4 py-3" placeholder="Ej: Golem de Cobre"/>
       </div>
       <div class="sm:col-span-2">
-        <label class="text-sm font-medium text-base-300 block mb-1.5">Descripción</label>
-        <textarea name="description" required rows="3" class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="Descripción breve y atractiva..."></textarea>
+        <label class="text-sm font-medium text-muted block mb-1.5">Descripción</label>
+        <textarea name="description" required rows="3" class="w-full input-app rounded-xl px-4 py-3" placeholder="Descripción breve..."></textarea>
       </div>
       <div>
-        <label class="text-sm font-medium text-base-300 block mb-1.5">Precio (ARS)</label>
-        <input name="price" type="number" min="0" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="0"/>
+        <label class="text-sm font-medium text-muted block mb-1.5">Precio (ARS)</label>
+        <input name="price" type="number" min="0" required class="w-full input-app rounded-xl px-4 py-3" placeholder="0"/>
       </div>
       <div>
-        <label class="text-sm font-medium text-base-300 block mb-1.5">Imagen</label>
-        <input name="image" type="file" accept="image/*" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-2.5 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-flame-600 file:text-base-950 file:text-sm file:font-bold hover:file:bg-flame-500 file:cursor-pointer cursor-pointer"/>
+        <label class="text-sm font-medium text-muted block mb-1.5">Imagen</label>
+        <input name="image" type="file" accept="image/*" required class="w-full input-app rounded-xl px-4 py-2.5 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-accent file:text-sm file:font-bold file:cursor-pointer cursor-pointer"/>
+      </div>
+      <div class="sm:col-span-2">
+        <label class="text-sm font-medium text-muted block mb-2">Etiquetas de categoría</label>
+        <div id="tags-picker" class="flex flex-wrap gap-2 mb-3"></div>
+        <div class="flex gap-2">
+          <input id="new-tag-input" class="flex-1 input-app rounded-xl px-4 py-2.5" placeholder="Crear nueva etiqueta..."/>
+          <button type="button" id="btn-add-tag-inline" class="btn-ghost px-5 py-2.5 rounded-xl font-bold">+ Crear</button>
+        </div>
       </div>
       <div class="sm:col-span-2 flex items-center justify-between gap-3 mt-2">
-        <div id="upload-status" class="text-sm text-base-400"></div>
-        <button type="submit" class="bg-flame-600 hover:bg-flame-500 text-base-950 font-bold px-8 py-3 rounded-xl transition disabled:bg-base-700 disabled:text-base-500">
-          Publicar producto
-        </button>
+        <div id="upload-status" class="text-sm text-muted"></div>
+        <button type="submit" class="btn-accent px-8 py-3 rounded-xl font-bold disabled:opacity-50">Publicar producto</button>
       </div>
-    </form>
-  `;
+    </form>`;
+  selectedTags = new Set();
+  renderTagsPicker();
+  $('btn-add-tag-inline').addEventListener('click', () => {
+    const v = $('new-tag-input').value.trim();
+    if (!v) return;
+    selectedTags.add(v);
+    $('new-tag-input').value = '';
+    renderTagsPicker();
+  });
   $('form-upload').addEventListener('submit', handleUploadProduct);
+}
+
+function renderTagsPicker() {
+  const all = new Set([...state.categories.map(c => c.name), ...selectedTags]);
+  $('tags-picker').innerHTML = [...all].map(name => `
+    <button type="button" data-tag="${name}" class="tag-chip px-4 py-1.5 rounded-full text-sm font-semibold border transition ${selectedTags.has(name) ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">
+      ${selectedTags.has(name) ? '✓ ' : ''}${name}
+    </button>`).join('') || '<span class="text-sm text-faint">Sin etiquetas aún. Crea la primera.</span>';
+  $('tags-picker').querySelectorAll('.tag-chip').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.dataset.tag;
+      selectedTags.has(t) ? selectedTags.delete(t) : selectedTags.add(t);
+      renderTagsPicker();
+    });
+  });
+}
+
+async function ensureCategory(name) {
+  const existing = state.categories.find(c => c.name.toLowerCase() === name.toLowerCase());
+  if (existing) return existing.name;
+  await addDoc(categoriesRef, { name, createdAt: serverTimestamp() });
+  return name;
 }
 
 async function handleUploadProduct(e) {
@@ -592,414 +850,308 @@ async function handleUploadProduct(e) {
   const description = data.get('description').trim();
   const price = parseFloat(data.get('price'));
   const file = data.get('image');
-
   const btn = form.querySelector('button[type=submit]');
   const status = $('upload-status');
   btn.disabled = true;
-
   try {
-    if (!file || file.size === 0) throw new Error('Debes seleccionar una imagen válida');
-    if (file.size > 32 * 1024 * 1024) throw new Error('La imagen no puede superar los 32MB');
-    if (!file.type.startsWith('image/')) throw new Error('El archivo debe ser una imagen');
-
+    if (!file || file.size === 0 || !file.type.startsWith('image/')) throw new Error('Selecciona una imagen válida');
     status.textContent = 'Subiendo imagen...';
-    
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-      method: 'POST',
-      body: formData
-    });
-    
-    if (!imgbbRes.ok) {
-      const errData = await imgbbRes.json().catch(() => ({}));
-      throw new Error(errData.error?.message || 'Error al subir imagen');
-    }
-    
-    const imgbbData = await imgbbRes.json();
-    const imageUrl = imgbbData.data.url;
-
+    const imageUrl = await uploadImageToImgBB(file);
     status.textContent = 'Guardando producto...';
-    await addDoc(productsRef, {
-      name, description,
-      price: Number(price),
-      image: imageUrl,
-      createdAt: serverTimestamp()
-    });
-
-    showToast('✓ Producto publicado con éxito', 'success');
-    form.reset();
-    status.textContent = '';
-  } catch (err) {
-    console.error('Error:', err);
-    const msg = err.message || 'Error desconocido';
-    status.innerHTML = `<span class="text-red-500 font-medium">❌ ${msg}</span>`;
-    showToast('Error: ' + msg, 'error');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-async function renderAdminOrders(parent) {
-  parent.innerHTML = '<div class="py-12 text-center text-base-500">Cargando órdenes...</div>';
-  try {
-    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
-    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    if (orders.length === 0) {
-      parent.innerHTML = '<div class="py-12 text-center text-base-500">Aún no hay órdenes.</div>';
-      return;
-    }
-
-    parent.innerHTML = `
-      <div class="space-y-3">
-        ${orders.map(o => `
-          <div class="bg-base-800 border border-base-700 rounded-xl p-5 hover:border-flame-500/30 transition">
-            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-              <div>
-                <div class="font-semibold text-base-100">${o.buyer?.name || 'Cliente'}</div>
-                <div class="text-xs text-base-500">${o.buyer?.email || ''}</div>
-                <div class="text-xs text-base-600 mt-1">CP: ${o.zip || '-'} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
-              </div>
-              <div class="text-right">
-                <div class="font-display font-bold text-xl text-flame-500">${fmtMoney(o.total)}</div>
-                <span class="text-xs inline-block px-2.5 py-1 rounded-full mt-1 ${o.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}">${o.status || 'pending'}</span>
-              </div>
-            </div>
-            <div class="border-t border-base-700 pt-3 space-y-1.5">
-              ${o.items.map(it => `
-                <div class="flex justify-between text-sm">
-                  <span class="text-base-300">${it.quantity}× ${it.name}</span>
-                  <span class="text-base-400">${fmtMoney(it.price * it.quantity)}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+    const cats = [];
+    for (const t of selectedTags) cats.push(await ensureCategory(t));
+    await addDoc(productsRef, { name, description, price: Number(price), image: imageUrl, categories: cats, createdAt: serverTimestamp() });
+    showToast('✓ Producto publicado', 'success');
+    form.reset(); selectedTags = new Set(); renderTagsPicker(); status.textContent = '';
   } catch (err) {
     console.error(err);
-    parent.innerHTML = `<div class="py-12 text-center text-red-500">Error al cargar órdenes: ${err.message}</div>`;
+    status.innerHTML = `<span style="color:#dc2626">❌ ${err.message}</span>`;
+    showToast('Error: ' + err.message, 'error');
+  } finally { btn.disabled = false; }
+}
+
+/* ---- GESTOR DE ETIQUETAS ---- */
+function renderTagsManager(parent) {
+  parent.innerHTML = `
+    <div class="flex flex-col sm:flex-row gap-2 mb-6">
+      <input id="tag-manage-input" class="flex-1 input-app rounded-xl px-4 py-3" placeholder="Nueva etiqueta de categoría..."/>
+      <button id="btn-tag-create" class="btn-accent px-6 py-3 rounded-xl font-bold">Crear etiqueta</button>
+    </div>
+    <div id="tags-list" class="space-y-2"></div>`;
+  const list = $('tags-list');
+  if (state.categories.length === 0) {
+    list.innerHTML = '<p class="text-muted text-sm py-6 text-center">Aún no hay etiquetas. Crea la primera arriba.</p>';
+  } else {
+    list.innerHTML = state.categories.map(c => {
+      const count = state.products.filter(p => (p.categories || []).includes(c.name)).length;
+      return `<div class="flex items-center justify-between bg-surface2 border border-app rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span class="font-semibold text-main">${c.name}</span>
+          <span class="text-xs text-faint">${count} producto${count === 1 ? '' : 's'}</span>
+        </div>
+        <button data-del="${c.id}" data-name="${c.name}" class="btn-del-tag p-2 rounded-lg text-muted hover:text-red-500 transition" title="Eliminar etiqueta">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.btn-del-tag').forEach(b => b.addEventListener('click', () => deleteTag(b.dataset.del, b.dataset.name)));
+  }
+  $('btn-tag-create').addEventListener('click', async () => {
+    const v = $('tag-manage-input').value.trim();
+    if (!v) return;
+    if (state.categories.some(c => c.name.toLowerCase() === v.toLowerCase())) { showToast('Esa etiqueta ya existe', 'error'); return; }
+    await addDoc(categoriesRef, { name: v, createdAt: serverTimestamp() });
+    $('tag-manage-input').value = '';
+    showToast('Etiqueta creada', 'success');
+  });
+}
+
+async function deleteTag(id, name) {
+  if (!confirm(`¿Eliminar la etiqueta "${name}"? Se quitará de los productos.`)) return;
+  try {
+    await deleteDoc(doc(db, 'categories', id));
+    const q = query(productsRef, where('categories', 'array-contains', name));
+    const snap = await getDocs(q);
+    for (const d of snap.docs) {
+      await updateDoc(d.ref, { categories: (d.data().categories || []).filter(c => c !== name) });
+    }
+    showToast('Etiqueta eliminada', 'success');
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+}
+
+/* ---- ÓRDENES ADMIN ---- */
+async function renderAdminOrders(parent) {
+  parent.innerHTML = '<div class="py-12 text-center text-muted">Cargando órdenes...</div>';
+  try {
+    const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc')));
+    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!orders.length) { parent.innerHTML = '<div class="py-12 text-center text-muted">Aún no hay órdenes.</div>'; return; }
+    parent.innerHTML = `<div class="space-y-3">${orders.map(o => `
+      <div class="bg-surface2 border border-app rounded-xl p-5 hover:border-accent transition">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <div class="font-semibold text-main">${o.buyer?.name || 'Cliente'} ${o.buyer?.nickname ? `(@${o.buyer.nickname})` : ''}</div>
+            <div class="text-xs text-muted">${o.buyer?.email || ''}</div>
+            <div class="text-xs text-faint mt-1">📍 ${o.delivery?.address || 'Sin dirección'} · ${o.delivery?.city || ''}</div>
+            <div class="text-xs text-faint">📱 ${o.delivery?.whatsapp || ''} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-display font-bold text-xl text-accent">${fmtMoney(o.total)}</div>
+            <span class="text-xs inline-block px-2.5 py-1 rounded-full mt-1 bg-accent-soft text-accent border border-accent">${o.status || 'pending'}</span>
+          </div>
+        </div>
+        <div class="border-t border-app pt-3 space-y-1.5">
+          ${(o.items || []).map(it => `<div class="flex justify-between text-sm"><span class="text-muted">${it.quantity}× ${it.name}</span><span class="text-muted">${fmtMoney(it.price * it.quantity)}</span></div>`).join('')}
+        </div>
+      </div>`).join('')}</div>`;
+  } catch (err) {
+    parent.innerHTML = `<div class="py-12 text-center text-red-500">Error: ${err.message}</div>`;
   }
 }
 
-// ============ RENDER: CATALOG ============
+/* ---- CATÁLOGO + FILTRO ---- */
 function renderCatalog(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
-  
-  if (state.products.length === 0) {
-    section.innerHTML = `
-      <div class="text-center py-16">
-        <div class="text-6xl mb-4">📦</div>
-        <h2 class="font-display font-bold text-2xl mb-2">Sin productos por ahora</h2>
-        <p class="text-base-500">Vuelve pronto, estamos preparando novedades.</p>
-      </div>
-    `;
-    parent.appendChild(section);
-    return;
-  }
-  
-  section.innerHTML = `
-    <div class="mb-8">
-      <h2 class="font-display font-bold text-4xl tracking-tight flex items-center gap-3">
-        <span class="w-3 h-3 rounded-full bg-flame-500 animate-glow-pulse"></span>
-        Catálogo
-      </h2>
-      <p class="text-base-400 mt-2">Piezas seleccionadas para ti.</p>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      ${state.products.map(p => `
-        <article class="group bg-base-900 border border-base-800 rounded-2xl overflow-hidden hover:border-flame-500/40 hover:shadow-xl hover:shadow-flame-500/5 transition-all duration-300">
-          <div class="aspect-square bg-base-800 overflow-hidden relative">
-            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400?text=Imagen'"/>
-            <div class="absolute inset-0 bg-gradient-to-t from-base-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </div>
-          <div class="p-5">
-            <div class="flex items-start justify-between gap-3 mb-2">
-              <h3 class="font-display font-semibold text-lg leading-tight group-hover:text-flame-400 transition-colors">${p.name}</h3>
-              <div class="font-bold text-flame-500 whitespace-nowrap">${fmtMoney(p.price)}</div>
-            </div>
-            <p class="text-sm text-base-500 mb-4 line-clamp-2 min-h-[40px]">${p.description || ''}</p>
-            <button class="btn-add-to-cart w-full bg-base-800 hover:bg-flame-600 hover:text-base-950 text-base-200 py-3 rounded-xl text-sm font-bold transition-all duration-300 border border-base-700 hover:border-flame-500" data-id="${p.id}">
-              Agregar al carrito
-            </button>
-          </div>
-        </article>
-      `).join('')}
-    </div>
-  `;
-  parent.appendChild(section);
+  const filtered = state.activeCategory === 'all'
+    ? state.products
+    : state.products.filter(p => (p.categories || []).includes(state.activeCategory));
 
-  section.querySelectorAll('.btn-add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => addToCart(btn.dataset.id));
-  });
-}
-
-// ============ RENDER: MY ORDERS ============
-function renderMyOrders(parent) {
-  if (!state.user) return;
-  const section = document.createElement('section');
-  section.id = 'my-orders-section';
   section.innerHTML = `
     <div class="mb-6">
-      <h2 class="font-display font-bold text-2xl flex items-center gap-3">
-        <span class="w-2.5 h-2.5 rounded-full bg-flame-500"></span>
-        Mis órdenes
+      <h2 class="font-display font-bold text-4xl tracking-tight text-main flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-accent animate-glow-pulse"></span> Catálogo
       </h2>
-      <p class="text-base-500 text-sm mt-1">Tu historial de compras.</p>
+      <p class="text-muted mt-2">Lo que circula hoy en el ágora.</p>
     </div>
-    <div id="my-orders-content" class="bg-base-900 border border-base-800 rounded-2xl p-6">
-      <div class="py-8 text-center text-base-500 text-sm">Cargando...</div>
-    </div>
-  `;
+    ${state.categories.length ? `
+    <div class="flex flex-wrap gap-2 mb-8">
+      <button data-cat="all" class="cat-chip px-4 py-2 rounded-full text-sm font-semibold border transition ${state.activeCategory === 'all' ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">Todas</button>
+      ${state.categories.map(c => `
+        <button data-cat="${c.name}" class="cat-chip px-4 py-2 rounded-full text-sm font-semibold border transition ${state.activeCategory === c.name ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">${c.name}</button>`).join('')}
+    </div>` : ''}
+    ${filtered.length === 0 ? `
+      <div class="text-center py-16">
+        <div class="text-6xl mb-4">🏺</div>
+        <h3 class="font-display font-bold text-2xl mb-2 text-main">Nada por aquí todavía</h3>
+        <p class="text-muted">El ágora se está llenando. Vuelve pronto.</p>
+      </div>` : `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${filtered.map(p => `
+          <article class="group bg-surface border border-app rounded-2xl overflow-hidden hover:border-accent hover:shadow-xl transition-all duration-300 relative">
+            ${state.isAdmin ? `
+            <button data-del="${p.id}" class="btn-del-product absolute top-3 right-3 z-10 p-2 rounded-lg bg-surface2 border border-app text-muted hover:text-red-500 hover:border-red-500 transition" title="Eliminar producto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+            </button>` : ''}
+            <div class="aspect-square bg-surface2 overflow-hidden">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
+            </div>
+            <div class="p-5">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <h3 class="font-display font-semibold text-lg leading-tight text-main group-hover:text-accent transition-colors">${p.name}</h3>
+                <div class="font-bold text-accent whitespace-nowrap">${fmtMoney(p.price)}</div>
+              </div>
+              <p class="text-sm text-muted mb-3 line-clamp-2 min-h-[40px]">${p.description || ''}</p>
+              ${(p.categories || []).length ? `<div class="flex flex-wrap gap-1.5 mb-4">${p.categories.map(c => `<span class="text-xs px-2 py-0.5 rounded-full bg-accent-soft text-accent border border-accent">${c}</span>`).join('')}</div>` : '<div class="mb-4"></div>'}
+              <button class="btn-add-to-cart w-full btn-ghost py-3 rounded-xl text-sm font-bold hover:!border-accent hover:!text-accent" data-id="${p.id}">Agregar al carrito</button>
+            </div>
+          </article>`).join('')}
+      </div>`}`;
   parent.appendChild(section);
 
-  const q = query(
-    collection(db, 'orders'),
-    where('buyer.uid', '==', state.user.uid),
-    orderBy('createdAt', 'desc')
-  );
-  
-  onSnapshot(q, (snap) => {
-    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const container = $('my-orders-content');
-    
-    if (orders.length === 0) {
-      container.innerHTML = '<div class="py-8 text-center text-base-500 text-sm">Aún no has realizado ninguna compra.</div>';
-      return;
-    }
-    
-    container.innerHTML = `<div class="space-y-3">${orders.map(o => `
-      <div class="bg-base-800 border border-base-700 rounded-xl p-4 hover:border-flame-500/30 transition">
-        <div class="flex items-center justify-between mb-2">
-          <div class="text-xs text-base-500">${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
-          <span class="text-xs px-2.5 py-1 rounded-full ${o.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'}">${o.status || 'pending'}</span>
-        </div>
-        <div class="font-semibold text-base-200">${o.items.length} ${o.items.length === 1 ? 'producto' : 'productos'} · <span class="text-flame-500 font-bold">${fmtMoney(o.total)}</span></div>
-        <div class="text-xs text-base-600 mt-1">CP: ${o.zip || '-'}</div>
-      </div>
-    `).join('')}</div>`;
-  }, (err) => {
-    console.error(err);
-    $('my-orders-content').innerHTML = `<div class="py-8 text-center text-red-500 text-sm">Error al cargar tu historial.</div>`;
-  });
+  section.querySelectorAll('.cat-chip').forEach(b => b.addEventListener('click', () => { state.activeCategory = b.dataset.cat; render(); }));
+  section.querySelectorAll('.btn-add-to-cart').forEach(b => b.addEventListener('click', () => addToCart(b.dataset.id)));
+  section.querySelectorAll('.btn-del-product').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('¿Eliminar este producto del ágora?')) return;
+    await deleteDoc(doc(db, 'products', b.dataset.del));
+    showToast('Producto eliminado', 'success');
+  }));
 }
 
-// ============ CART ============
-function addToCart(productId) {
-  const p = state.products.find(x => x.id === productId);
+/* ---- MIS ÓRDENES ---- */
+function renderMyOrders(parent) {
+  const section = document.createElement('section');
+  section.innerHTML = `
+    <div class="mb-6">
+      <h2 class="font-display font-bold text-2xl text-main flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-accent"></span> Mis órdenes</h2>
+      <p class="text-muted text-sm mt-1">Tu historial en el ágora.</p>
+    </div>
+    <div id="my-orders-content" class="bg-surface border border-app rounded-2xl p-6"><div class="py-8 text-center text-muted text-sm">Cargando...</div></div>`;
+  parent.appendChild(section);
+  onSnapshot(
+    query(collection(db, 'orders'), where('buyer.uid', '==', state.user.uid), orderBy('createdAt', 'desc')),
+    (snap) => {
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const c = $('my-orders-content');
+      if (!orders.length) { c.innerHTML = '<div class="py-8 text-center text-muted text-sm">Aún no has realizado ninguna compra.</div>'; return; }
+      c.innerHTML = `<div class="space-y-3">${orders.map(o => `
+        <div class="bg-surface2 border border-app rounded-xl p-4 hover:border-accent transition">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs text-faint">${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent">${o.status || 'pending'}</span>
+          </div>
+          <div class="font-semibold text-main">${o.items.length} producto${o.items.length === 1 ? '' : 's'} · <span class="text-accent font-bold">${fmtMoney(o.total)}</span></div>
+          <div class="text-xs text-faint mt-1">📍 ${o.delivery?.address || ''}</div>
+        </div>`).join('')}</div>`;
+    },
+    () => { $('my-orders-content').innerHTML = '<div class="py-8 text-center text-red-500 text-sm">Error al cargar tu historial.</div>'; }
+  );
+}
+
+/* ================= CARRITO ================= */
+function addToCart(id) {
+  const p = state.products.find(x => x.id === id);
   if (!p) return;
-  const existing = state.cart.find(x => x.id === productId);
-  if (existing) existing.quantity++;
-  else state.cart.push({ id: p.id, name: p.name, price: p.price, image: p.image, quantity: 1 });
-  saveCart();
-  updateCartBadge();
+  const ex = state.cart.find(x => x.id === id);
+  ex ? ex.quantity++ : state.cart.push({ id: p.id, name: p.name, price: p.price, image: p.image, quantity: 1 });
+  saveCart(); updateCartBadge();
   showToast(`${p.name} añadido`, 'success');
 }
-
-function updateCartQty(id, delta) {
-  const item = state.cart.find(x => x.id === id);
-  if (!item) return;
-  item.quantity += delta;
-  if (item.quantity <= 0) state.cart = state.cart.filter(x => x.id !== id);
-  saveCart();
-  renderCart();
-  updateCartBadge();
+function updateCartQty(id, d) {
+  const it = state.cart.find(x => x.id === id);
+  if (!it) return;
+  it.quantity += d;
+  if (it.quantity <= 0) state.cart = state.cart.filter(x => x.id !== id);
+  saveCart(); renderCart(); updateCartBadge();
 }
-
-function removeFromCart(id) {
-  state.cart = state.cart.filter(x => x.id !== id);
-  saveCart();
-  renderCart();
-  updateCartBadge();
-}
-
-function cartTotal() {
-  return state.cart.reduce((acc, it) => acc + it.price * it.quantity, 0);
-}
-
-function cartCount() {
-  return state.cart.reduce((acc, it) => acc + it.quantity, 0);
-}
-
+function removeFromCart(id) { state.cart = state.cart.filter(x => x.id !== id); saveCart(); renderCart(); updateCartBadge(); }
+const cartTotal = () => state.cart.reduce((a, i) => a + i.price * i.quantity, 0);
+const cartCount = () => state.cart.reduce((a, i) => a + i.quantity, 0);
 function updateCartBadge() {
-  const badge = $('cart-badge');
-  const count = cartCount();
-  if (count > 0) {
-    badge.textContent = count;
-    badge.classList.remove('hidden');
-  } else {
-    badge.classList.add('hidden');
-  }
+  const b = $('cart-badge'), n = cartCount();
+  b.textContent = n;
+  b.classList.toggle('hidden', n === 0);
 }
-
 function renderCart() {
-  const items = $('cart-items');
-  const footer = $('cart-footer');
-
-  if (state.cart.length === 0) {
-    items.innerHTML = `
-      <div class="text-center py-16">
-        <div class="text-6xl mb-4">🛒</div>
-        <p class="text-base-500">Tu carrito está vacío.</p>
-      </div>
-    `;
+  const items = $('cart-items'), footer = $('cart-footer');
+  if (!state.cart.length) {
+    items.innerHTML = '<div class="text-center py-16"><div class="text-6xl mb-4">🛒</div><p class="text-muted">Tu carrito está vacío.</p></div>';
     footer.innerHTML = '';
     return;
   }
-
   items.innerHTML = `<div class="space-y-4">${state.cart.map(it => `
-    <div class="flex gap-3 pb-4 border-b border-base-800 last:border-0">
-      <img src="${it.image}" class="w-16 h-16 rounded-lg object-cover bg-base-800" onerror="this.src='https://via.placeholder.com/64'"/>
+    <div class="flex gap-3 pb-4 border-b border-app last:border-0">
+      <img src="${it.image}" class="w-16 h-16 rounded-lg object-cover bg-surface2" onerror="this.onerror=null;this.src='${IMG_FALLBACK}'"/>
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
-          <div class="font-medium text-sm truncate text-base-200">${it.name}</div>
-          <button class="btn-remove-cart text-base-600 hover:text-red-500 transition flex-shrink-0" data-id="${it.id}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/>
-            </svg>
+          <div class="font-medium text-sm truncate text-main">${it.name}</div>
+          <button class="btn-remove-cart text-faint hover:text-red-500 transition" data-id="${it.id}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
           </button>
         </div>
-        <div class="text-sm text-base-500 mt-0.5">${fmtMoney(it.price)}</div>
+        <div class="text-sm text-muted mt-0.5">${fmtMoney(it.price)}</div>
         <div class="flex items-center gap-2 mt-2">
-          <button class="btn-qty w-7 h-7 rounded-lg border border-base-700 hover:bg-base-700 transition flex items-center justify-center text-base-300" data-id="${it.id}" data-delta="-1">−</button>
-          <span class="text-sm font-medium w-6 text-center text-base-200">${it.quantity}</span>
-          <button class="btn-qty w-7 h-7 rounded-lg border border-base-700 hover:bg-base-700 transition flex items-center justify-center text-base-300" data-id="${it.id}" data-delta="1">+</button>
-          <span class="ml-auto text-sm font-bold text-flame-500">${fmtMoney(it.price * it.quantity)}</span>
+          <button class="btn-qty w-7 h-7 rounded-lg border border-app bg-surface2 text-main" data-id="${it.id}" data-delta="-1">−</button>
+          <span class="text-sm font-medium w-6 text-center text-main">${it.quantity}</span>
+          <button class="btn-qty w-7 h-7 rounded-lg border border-app bg-surface2 text-main" data-id="${it.id}" data-delta="1">+</button>
+          <span class="ml-auto text-sm font-bold text-accent">${fmtMoney(it.price * it.quantity)}</span>
         </div>
       </div>
-    </div>
-  `).join('')}</div>`;
+    </div>`).join('')}</div>`;
+
+  let footerBtn = '';
+  if (!state.profile) footerBtn = `<button id="btn-checkout" class="w-full btn-ghost py-3.5 rounded-xl font-bold">Completa tu perfil para continuar</button>`;
+  else if (state.profile.zone === 'waitlist') footerBtn = `<button disabled class="w-full btn-accent py-3.5 rounded-xl font-bold">⏳ Sin envíos a tu zona (lista de espera)</button>`;
+  else footerBtn = `<button id="btn-checkout" class="w-full btn-accent py-3.5 rounded-xl font-bold">Continuar con la compra</button>`;
 
   footer.innerHTML = `
     <div class="flex items-center justify-between mb-4">
-      <span class="text-base-400">Subtotal</span>
-      <span class="font-display font-bold text-2xl text-flame-500">${fmtMoney(cartTotal())}</span>
-    </div>
-    <button id="btn-checkout" class="w-full bg-flame-600 hover:bg-flame-500 text-base-950 font-bold py-3.5 rounded-xl transition">
-      Continuar con la compra
-    </button>
-    <p class="text-xs text-base-600 text-center mt-3">Envío calculado en el siguiente paso.</p>
-  `;
+      <span class="text-muted">Subtotal</span>
+      <span class="font-display font-bold text-2xl text-accent">${fmtMoney(cartTotal())}</span>
+    </div>${footerBtn}
+    <p class="text-xs text-faint text-center mt-3">Entrega en tu dirección registrada.</p>`;
 
-  items.querySelectorAll('.btn-qty').forEach(b => {
-    b.addEventListener('click', () => updateCartQty(b.dataset.id, parseInt(b.dataset.delta)));
+  items.querySelectorAll('.btn-qty').forEach(b => b.addEventListener('click', () => updateCartQty(b.dataset.id, +b.dataset.delta)));
+  items.querySelectorAll('.btn-remove-cart').forEach(b => b.addEventListener('click', () => removeFromCart(b.dataset.id)));
+  const co = $('btn-checkout');
+  if (co) co.addEventListener('click', () => {
+    if (!state.profile) { closeModal('modal-cart'); openProfileModal(false); return; }
+    openCheckout();
   });
-  items.querySelectorAll('.btn-remove-cart').forEach(b => {
-    b.addEventListener('click', () => removeFromCart(b.dataset.id));
-  });
-  $('btn-checkout').addEventListener('click', openCheckout);
 }
-
 function openCheckout() {
   closeModal('modal-cart');
-  $('input-zip').value = '';
-  $('zip-message').innerHTML = '';
-  $('zip-message').className = 'text-sm min-h-[20px] mb-4';
-  $('btn-pay-mp').disabled = true;
+  $('checkout-summary').innerHTML = `
+    <div class="bg-surface2 border border-app rounded-xl p-4 space-y-1.5">
+      <div class="flex justify-between"><span class="text-muted">Entregar a</span><span class="font-semibold text-main">@${state.profile.nickname}</span></div>
+      <div class="flex justify-between gap-4"><span class="text-muted">Dirección</span><span class="text-main text-right">${state.profile.address}</span></div>
+      <div class="flex justify-between"><span class="text-muted">Ciudad</span><span class="text-main">${state.profile.city}</span></div>
+      <div class="flex justify-between"><span class="text-muted">WhatsApp</span><span class="text-main">${state.profile.whatsapp}</span></div>
+      <div class="border-t border-app pt-2 flex justify-between"><span class="text-muted">Total (${cartCount()} art.)</span><span class="font-bold text-accent">${fmtMoney(cartTotal())}</span></div>
+    </div>`;
   openModal('modal-checkout');
-  setTimeout(() => $('input-zip').focus(), 100);
 }
 
-// ============ CART MODAL EVENTS ============
 $('btn-cart').addEventListener('click', () => {
-  if (!state.user) {
-    showToast('Inicia sesión para ver tu carrito');
-    openModal('modal-login');
-    return;
-  }
-  renderCart();
-  openModal('modal-cart');
+  if (!state.user) { showToast('Inicia sesión para ver tu carrito'); openModal('modal-login'); return; }
+  renderCart(); openModal('modal-cart');
 });
 $('btn-close-cart').addEventListener('click', () => closeModal('modal-cart'));
 $('cart-backdrop').addEventListener('click', () => closeModal('modal-cart'));
 $('btn-close-checkout').addEventListener('click', () => closeModal('modal-checkout'));
 
-// ============ CHECKOUT (ZIP + MP) ============
-$('input-zip').addEventListener('input', (e) => {
-  const zip = e.target.value.replace(/\D/g, '').slice(0, 4);
-  e.target.value = zip;
-  const msg = $('zip-message');
+/* ================= PAGO MERCADO PAGO ================= */
+$('btn-pay-mp').addEventListener('click', async () => {
+  if (!state.user || !state.profile) return;
   const btn = $('btn-pay-mp');
-  
-  if (!zip) {
-    msg.innerHTML = '';
-    btn.disabled = true;
-    return;
-  }
-  if (zip.length < 4) {
-    msg.innerHTML = '';
-    btn.disabled = true;
-    return;
-  }
-  
-  if (VALID_ZIPS.includes(zip)) {
-    msg.innerHTML = `<span class="text-emerald-400 font-medium">✓ Envío Express Nacional habilitado para tu zona.</span>`;
-    msg.className = 'text-sm min-h-[20px] mb-4 text-emerald-400';
-    btn.disabled = false;
-  } else {
-    msg.innerHTML = `<span class="text-red-500 font-medium">✗ Temporalmente sin stock en el centro de distribución asignado a tu zona.</span>`;
-    msg.className = 'text-sm min-h-[20px] mb-4 text-red-500';
-    btn.disabled = true;
-  }
-});
-
-$('btn-pay-mp').addEventListener('click', handlePayWithMP);
-
-async function handlePayWithMP() {
-  if (!state.user) {
-    showToast('Debes iniciar sesión');
-    return;
-  }
-  const zip = $('input-zip').value;
-  if (!VALID_ZIPS.includes(zip)) {
-    showToast('Código postal no válido', 'error');
-    return;
-  }
-
-  const btn = $('btn-pay-mp');
-  btn.disabled = true;
-  btn.textContent = 'Procesando...';
-
+  btn.disabled = true; btn.textContent = 'Procesando...';
   try {
-    const orderData = {
-      items: state.cart.map(it => ({
-        id: it.id, name: it.name, price: it.price, quantity: it.quantity
-      })),
+    const orderRef = await addDoc(collection(db, 'orders'), {
+      items: state.cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
       total: cartTotal(),
-      zip,
-      buyer: {
-        uid: state.user.uid,
-        name: state.user.displayName,
-        email: state.user.email
-      },
+      buyer: { uid: state.user.uid, name: state.user.displayName, email: state.user.email, nickname: state.profile.nickname },
+      delivery: { address: state.profile.address, city: state.profile.city, whatsapp: state.profile.whatsapp, location: state.profile.location },
       status: 'pending',
       createdAt: serverTimestamp()
-    };
-    const orderRef = await addDoc(collection(db, 'orders'), orderData);
-
-    const mpItems = state.cart.map(it => ({
-      id: it.id,
-      title: it.name,
-      description: it.name,
-      picture_url: it.image,
-      category_id: 'general',
-      quantity: it.quantity,
-      currency_id: 'ARS',
-      unit_price: Number(it.price)
-    }));
+    });
 
     const preferenceBody = {
-      items: mpItems,
-      payer: {
-        name: state.user.displayName?.split(' ')[0] || 'Cliente',
-        surname: state.user.displayName?.split(' ').slice(1).join(' ') || '',
-        email: state.user.email
-      },
+      items: state.cart.map(i => ({
+        id: i.id, title: i.name, description: i.name, picture_url: i.image,
+        category_id: 'general', quantity: i.quantity, currency_id: 'ARS', unit_price: Number(i.price)
+      })),
+      payer: { name: state.profile.nickname, email: state.user.email },
       external_reference: orderRef.id,
       back_urls: {
         success: window.location.origin + window.location.pathname,
@@ -1007,60 +1159,57 @@ async function handlePayWithMP() {
         pending: window.location.origin + window.location.pathname
       },
       auto_return: 'approved',
-      metadata: { zip: zip, buyer_uid: state.user.uid }
+      metadata: { buyer_uid: state.user.uid, city: state.profile.city }
     };
 
     let initPoint = null;
     try {
       const mpRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${MP_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(preferenceBody)
       });
-
-      if (mpRes.ok) {
-        const mpData = await mpRes.json();
-        initPoint = mpData.init_point;
-      }
-    } catch (fetchErr) {
-      console.warn('Error al crear preferencia MP (posible CORS):', fetchErr);
-    }
+      if (mpRes.ok) initPoint = (await mpRes.json()).init_point;
+    } catch (e) { console.warn('MP CORS:', e); }
 
     closeModal('modal-checkout');
-    state.cart = [];
-    saveCart();
-    updateCartBadge();
+    state.cart = []; saveCart(); updateCartBadge();
 
     if (initPoint) {
       showToast('Redirigiendo a Mercado Pago...', 'success');
       setTimeout(() => window.location.href = initPoint, 800);
     } else {
-      showToast('Pedido registrado. Mercado Pago no pudo generar el checkout (CORS).', 'info');
-      setTimeout(() => renderMain(), 1500);
+      showToast('Orden registrada. No se pudo generar el checkout de MP (CORS).', 'info');
+      setTimeout(render, 1500);
     }
-
   } catch (err) {
     console.error(err);
     showToast('Error al procesar el pago: ' + err.message, 'error');
-    btn.disabled = false;
-    btn.textContent = 'Pagar con Mercado Pago';
+    btn.disabled = false; btn.textContent = 'Pagar con Mercado Pago';
   }
-}
+});
 
-// ============ INIT ============
-initTheme();
+/* ================= SOPORTE ================= */
+function openSupport() {
+  $('support-contact').value = state.profile?.whatsapp || '';
+  openModal('modal-support');
+}
+$('btn-support').addEventListener('click', openSupport);
+$('btn-support-footer').addEventListener('click', openSupport);
+$('btn-close-support').addEventListener('click', () => closeModal('modal-support'));
+$('btn-send-support').addEventListener('click', () => {
+  const msg = $('support-message').value.trim();
+  const contact = $('support-contact').value.trim();
+  if (!msg) { showToast('Escribe tu consulta', 'error'); return; }
+  if (!contact) { showToast('Debes incluir un contacto telefónico/WhatsApp', 'error'); return; }
+  const subject = encodeURIComponent(`Soporte Agorlab — ${state.profile?.nickname || state.user?.displayName || 'Consulta'}`);
+  const body = encodeURIComponent(`${msg}\n\n---\nContacto telefónico/WhatsApp: ${contact}\nUsuario: ${state.user?.email || 'no logueado'}`);
+  window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+});
+
+/* ================= INIT ================= */
 updateCartBadge();
-
-if (!state.user && !state.hasVisited) {
-  renderHero();
-} else if (!state.user) {
-  openModal('modal-login');
-  renderHero();
-}
-
+render();
 </script>
 </body>
 </html>
