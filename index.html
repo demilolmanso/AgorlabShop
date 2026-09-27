@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Agorlab — Premium E-commerce</title>
+<title>Agorlab — Premium Store</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
+    darkMode: 'class',
     theme: {
       extend: {
         fontFamily: {
@@ -14,18 +15,57 @@
           display: ['Space Grotesk', 'system-ui', 'sans-serif']
         },
         colors: {
-          ink: '#0a0a0a',
-          ash: '#f5f5f4'
+          base: {
+            950: '#0a0a0a',
+            900: '#111111',
+            850: '#161616',
+            800: '#1c1c1c',
+            700: '#262626',
+            600: '#333333',
+            500: '#4d4d4d',
+            400: '#666666',
+            300: '#8c8c8c',
+            200: '#b3b3b3',
+            100: '#d9d9d9',
+            50:  '#f0f0f0'
+          },
+          flame: {
+            50:  '#fff7ed',
+            100: '#ffedd5',
+            200: '#fed7aa',
+            300: '#fdba74',
+            400: '#fb923c',
+            500: '#f97316',
+            600: '#ea580c',
+            700: '#c2410c',
+            800: '#9a3412',
+            900: '#7c2d12'
+          }
         },
         animation: {
-          'fade-in': 'fadeIn 0.3s ease-out',
-          'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          'fade-in': 'fadeIn 0.5s ease-out',
+          'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+          'slide-down': 'slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+          'float': 'float 6s ease-in-out infinite',
         },
         keyframes: {
           fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
           slideUp: {
-            '0%': { opacity: '0', transform: 'translateY(20px)' },
+            '0%': { opacity: '0', transform: 'translateY(30px)' },
             '100%': { opacity: '1', transform: 'translateY(0)' }
+          },
+          slideDown: {
+            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+            '100%': { opacity: '1', transform: 'translateY(0)' }
+          },
+          glowPulse: {
+            '0%, 100%': { opacity: '0.4' },
+            '50%': { opacity: '0.8' }
+          },
+          float: {
+            '0%, 100%': { transform: 'translateY(0px)' },
+            '50%': { transform: 'translateY(-20px)' }
           }
         }
       }
@@ -34,31 +74,72 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  body { 
+    font-family: 'Inter', sans-serif; 
+    -webkit-font-smoothing: antialiased;
+    background-color: #0a0a0a;
+    color: #f0f0f0;
+  }
   .font-display { font-family: 'Space Grotesk', sans-serif; }
   .scrollbar-thin::-webkit-scrollbar { width: 6px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type="number"] { -moz-appearance: textfield; }
+  
+  /* Efecto de texto con gradiente naranja */
+  .text-gradient-flame {
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fdba74 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Efecto de glow detrás del título */
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 70%);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  
+  /* Línea decorativa animada */
+  .accent-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #f97316, transparent);
+  }
 </style>
 </head>
-<body class="bg-white text-ink min-h-screen">
+<body class="bg-base-950 text-base-50 min-h-screen">
 
 <!-- ============ NAVBAR ============ -->
-<header id="navbar" class="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-neutral-200">
+<header id="navbar" class="sticky top-0 z-40 bg-base-950/80 backdrop-blur-xl border-b border-base-800">
   <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="#" class="font-display font-bold text-2xl tracking-tight">
-      <span class="text-ink">Agor</span><span class="text-neutral-400">lab</span>
+    <a href="#" class="font-display font-bold text-2xl tracking-tight flex items-center gap-2">
+      <span class="text-base-50">Agor</span><span class="text-flame-500">lab</span>
+      <span class="w-2 h-2 rounded-full bg-flame-500 animate-glow-pulse"></span>
     </a>
     <div class="flex items-center gap-2 sm:gap-4">
-      <button id="btn-cart" class="relative p-2 hover:bg-neutral-100 rounded-full transition" title="Carrito">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-        <span id="cart-badge" class="absolute -top-1 -right-1 bg-ink text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold hidden">0</span>
+      <button id="btn-theme-toggle" class="p-2 hover:bg-base-800 rounded-full transition" title="Cambiar tema">
+        <svg id="icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+      <button id="btn-cart" class="relative p-2 hover:bg-base-800 rounded-full transition" title="Carrito">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <span id="cart-badge" class="absolute -top-1 -right-1 bg-flame-500 text-base-950 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">0</span>
       </button>
       <div id="user-area" class="flex items-center gap-2"></div>
     </div>
@@ -66,64 +147,83 @@
 </header>
 
 <!-- ============ MAIN ============ -->
-<main id="main" class="max-w-7xl mx-auto px-6 py-10 min-h-[60vh]"></main>
+<main id="main" class="max-w-7xl mx-auto px-6 py-10 min-h-[70vh]"></main>
 
 <!-- ============ FOOTER ============ -->
-<footer class="border-t border-neutral-200 mt-20 py-10 text-center text-sm text-neutral-500">
-  <div class="font-display font-semibold text-ink mb-1">Agorlab</div>
-  <p>&copy; 2026. Diseño minimalista. Todos los derechos reservados.</p>
+<footer class="border-t border-base-800 mt-20 py-10 text-center text-sm text-base-400">
+  <div class="font-display font-semibold text-base-50 mb-1 flex items-center justify-center gap-2">
+    <span>Agor</span><span class="text-flame-500">lab</span>
+  </div>
+  <p>&copy; 2026. Diseño minimalista premium. Todos los derechos reservados.</p>
 </footer>
 
 <!-- ============ MODAL: LOGIN ============ -->
-<div id="modal-login" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
+<div id="modal-login" class="fixed inset-0 z-50 hidden items-center justify-center bg-base-950/90 backdrop-blur-md p-4">
+  <div class="bg-base-900 border border-base-700 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
     <div class="text-center mb-6">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-flame-500 to-flame-700 flex items-center justify-center">
+        <svg class="w-8 h-8 text-base-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
       <div class="font-display font-bold text-3xl mb-2">Bienvenido</div>
-      <p class="text-neutral-500 text-sm">Inicia sesión para acceder a la tienda</p>
+      <p class="text-base-400 text-sm">Inicia sesión para acceder a la experiencia completa</p>
     </div>
-    <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-neutral-300 hover:bg-neutral-50 transition py-3 px-4 rounded-xl font-medium">
+    <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-base-800 hover:bg-base-700 border border-base-600 transition py-3.5 px-4 rounded-xl font-medium">
       <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
     </button>
-    <p class="text-xs text-neutral-400 text-center mt-6">Al continuar aceptas nuestros términos y política de privacidad.</p>
+    <div class="mt-6 pt-6 border-t border-base-800 text-center">
+      <p class="text-xs text-base-500">Al continuar aceptas nuestros términos y política de privacidad.</p>
+    </div>
   </div>
 </div>
 
 <!-- ============ MODAL: CART ============ -->
 <div id="modal-cart" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="cart-backdrop"></div>
-  <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col animate-slide-up">
-    <div class="p-6 border-b border-neutral-200 flex items-center justify-between">
-      <h2 class="font-display font-bold text-xl">Tu carrito</h2>
-      <button id="btn-close-cart" class="p-2 hover:bg-neutral-100 rounded-full">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
+  <div class="absolute inset-0 bg-base-950/80 backdrop-blur-sm" id="cart-backdrop"></div>
+  <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-base-900 border-l border-base-800 shadow-2xl flex flex-col animate-slide-up">
+    <div class="p-6 border-b border-base-800 flex items-center justify-between">
+      <h2 class="font-display font-bold text-xl flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-flame-500"></span>
+        Tu carrito
+      </h2>
+      <button id="btn-close-cart" class="p-2 hover:bg-base-800 rounded-full transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-6 scrollbar-thin"></div>
-    <div id="cart-footer" class="border-t border-neutral-200 p-6"></div>
+    <div id="cart-footer" class="border-t border-base-800 p-6"></div>
   </div>
 </div>
 
 <!-- ============ MODAL: CHECKOUT ============ -->
-<div id="modal-checkout" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
+<div id="modal-checkout" class="fixed inset-0 z-50 hidden items-center justify-center bg-base-950/90 backdrop-blur-md p-4">
+  <div class="bg-base-900 border border-base-700 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-slide-up">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="font-display font-bold text-xl">Envío</h2>
-      <button id="btn-close-checkout" class="p-2 hover:bg-neutral-100 rounded-full">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
+      <h2 class="font-display font-bold text-xl flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-flame-500"></span>
+        Envío
+      </h2>
+      <button id="btn-close-checkout" class="p-2 hover:bg-base-800 rounded-full transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     </div>
-    <p class="text-sm text-neutral-600 mb-4">Ingresa tu código postal para calcular el costo y disponibilidad del envío.</p>
-    <input id="input-zip" type="text" inputmode="numeric" maxlength="4" placeholder="Ej: 7600" class="w-full border border-neutral-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-ink/20 text-lg tracking-widest font-medium mb-2"/>
+    <p class="text-sm text-base-400 mb-4">Ingresa tu código postal para calcular el costo y disponibilidad del envío.</p>
+    <input id="input-zip" type="text" inputmode="numeric" maxlength="4" placeholder="Ej: 7600" class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 text-lg tracking-widest font-medium mb-2 placeholder:text-base-600"/>
     <div id="zip-message" class="text-sm min-h-[20px] mb-4"></div>
-    <button id="btn-pay-mp" class="w-full bg-ink text-white py-3 rounded-xl font-medium hover:bg-neutral-800 transition disabled:bg-neutral-300 disabled:cursor-not-allowed" disabled>
+    <button id="btn-pay-mp" class="w-full bg-flame-600 hover:bg-flame-500 text-base-950 font-bold py-3.5 rounded-xl transition disabled:bg-base-700 disabled:text-base-500 disabled:cursor-not-allowed" disabled>
       Pagar con Mercado Pago
     </button>
   </div>
 </div>
 
-<!-- ============ MODAL: TOAST ============ -->
-<div id="toast" class="fixed bottom-6 right-6 z-[100] hidden bg-ink text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up"></div>
+<!-- ============ TOAST ============ -->
+<div id="toast" class="fixed bottom-6 right-6 z-[100] hidden px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up"></div>
 
 <!-- ============ FIREBASE & APP LOGIC ============ -->
 <script type="importmap">
@@ -131,8 +231,7 @@
   "imports": {
     "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
     "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
-    "firebase/storage": "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
   }
 }
 </script>
@@ -143,9 +242,8 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from 'firebase/auth';
 import {
-  getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, getDocs, doc, setDoc
+  getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, getDocs
 } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // ============ CONFIG ============
 const firebaseConfig = {
@@ -160,11 +258,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
 const ADMIN_EMAIL = "cepedademian2005@gmail.com";
 const MP_ACCESS_TOKEN = "APP_USR-2955434807999492-091915-855e6dc48a84e7b02a51fb8a9425c966-323912180";
+const IMGBB_API_KEY = "ddf97f646af43fb4a9ef9a58262698ba";
 const VALID_ZIPS = ["7600", "7620", "7607"];
 
 // ============ STATE ============
@@ -174,7 +272,7 @@ const state = {
   products: [],
   cart: JSON.parse(localStorage.getItem('agorlab_cart') || '[]'),
   adminTab: 'upload',
-  loading: false
+  hasVisited: localStorage.getItem('agorlab_visited') === 'true'
 };
 
 // ============ UTILS ============
@@ -185,7 +283,11 @@ const fmtMoney = (n) => new Intl.NumberFormat('es-AR', { style: 'currency', curr
 function showToast(msg, type = 'info') {
   const t = $('toast');
   t.textContent = msg;
-  t.className = `fixed bottom-6 right-6 z-[100] px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up ${type === 'error' ? 'bg-red-600 text-white' : type === 'success' ? 'bg-emerald-600 text-white' : 'bg-ink text-white'}`;
+  t.className = `fixed bottom-6 right-6 z-[100] px-5 py-3 rounded-xl shadow-2xl text-sm font-medium animate-slide-up ${
+    type === 'error' ? 'bg-red-600 text-white' : 
+    type === 'success' ? 'bg-flame-600 text-base-950' : 
+    'bg-base-800 text-base-50 border border-base-700'
+  }`;
   t.classList.remove('hidden');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.add('hidden'), 3500);
@@ -202,25 +304,66 @@ function closeModal(id) {
   m.classList.remove('flex');
 }
 
+// ============ THEME TOGGLE ============
+function initTheme() {
+  const savedTheme = localStorage.getItem('agorlab_theme') || 'dark';
+  document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+  updateThemeIcons(savedTheme);
+}
+
+function updateThemeIcons(theme) {
+  const isDark = theme === 'dark';
+  $('icon-sun').classList.toggle('hidden', isDark);
+  $('icon-moon').classList.toggle('hidden', !isDark);
+}
+
+$('btn-theme-toggle').addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  html.classList.toggle('dark');
+  const newTheme = isDark ? 'light' : 'dark';
+  localStorage.setItem('agorlab_theme', newTheme);
+  updateThemeIcons(newTheme);
+  
+  // Ajustar colores del body para tema claro
+  if (!isDark) {
+    document.body.className = 'bg-base-50 text-base-900 min-h-screen';
+  } else {
+    document.body.className = 'bg-base-950 text-base-50 min-h-screen';
+  }
+});
+
 // ============ AUTH ============
 $('btn-google-login').addEventListener('click', async () => {
   try {
     $('btn-google-login').disabled = true;
-    $('btn-google-login').textContent = 'Conectando...';
+    $('btn-google-login').innerHTML = `
+      <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Conectando...`;
     await signInWithPopup(auth, provider);
+    localStorage.setItem('agorlab_visited', 'true');
+    state.hasVisited = true;
   } catch (err) {
     console.error(err);
     showToast('Error al iniciar sesión', 'error');
     $('btn-google-login').disabled = false;
-    $('btn-google-login').innerHTML = `
-      <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Continuar con Google`;
+    resetGoogleButton();
   }
 });
+
+function resetGoogleButton() {
+  $('btn-google-login').innerHTML = `
+    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Continuar con Google`;
+}
 
 async function handleLogout() {
   try {
     await signOut(auth);
+    showToast('Sesión cerrada');
   } catch (err) {
     console.error(err);
   }
@@ -229,10 +372,21 @@ async function handleLogout() {
 onAuthStateChanged(auth, (user) => {
   state.user = user;
   state.isAdmin = !!user && user.email === ADMIN_EMAIL;
-  if (!user) openModal('modal-login');
-  else closeModal('modal-login');
+  
+  if (!user && !state.hasVisited) {
+    // Primera visita: mostrar hero
+    renderHero();
+  } else if (!user) {
+    // Ya visitó pero no está logueado: mostrar login
+    openModal('modal-login');
+    renderHero();
+  } else {
+    closeModal('modal-login');
+    renderMain();
+  }
+  
   renderUserArea();
-  renderMain();
+  updateCartBadge();
 });
 
 function renderUserArea() {
@@ -242,22 +396,109 @@ function renderUserArea() {
     return;
   }
   area.innerHTML = `
-    ${state.isAdmin ? `<span class="hidden sm:inline text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-1 rounded-full">ADMIN</span>` : ''}
-    <div class="flex items-center gap-2 pl-2 pr-1 py-1 bg-neutral-100 rounded-full">
-      <img src="${state.user.photoURL || ''}" alt="" class="w-7 h-7 rounded-full border-2 border-white shadow" onerror="this.style.display='none'"/>
-      <button id="btn-logout" class="p-1.5 hover:bg-neutral-200 rounded-full transition" title="Salir">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    ${state.isAdmin ? `<span class="hidden sm:inline text-xs font-bold text-flame-400 bg-flame-500/10 border border-flame-500/30 px-3 py-1 rounded-full">ADMIN</span>` : ''}
+    <div class="flex items-center gap-2 pl-2 pr-1 py-1 bg-base-800 rounded-full border border-base-700">
+      <img src="${state.user.photoURL || ''}" alt="" class="w-7 h-7 rounded-full border-2 border-base-600 shadow" onerror="this.style.display='none'"/>
+      <button id="btn-logout" class="p-1.5 hover:bg-base-700 rounded-full transition text-base-400 hover:text-flame-500" title="Salir">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
       </button>
     </div>
   `;
   $('btn-logout').addEventListener('click', handleLogout);
 }
 
+// ============ HERO / BIENVENIDA ============
+function renderHero() {
+  const main = $('main');
+  main.innerHTML = `
+    <div class="relative min-h-[70vh] flex flex-col items-center justify-center text-center overflow-hidden">
+      <!-- Glow effect -->
+      <div class="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-glow-pulse"></div>
+      
+      <!-- Contenido -->
+      <div class="relative z-10 max-w-4xl mx-auto animate-slide-up">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 bg-base-900 border border-base-700 rounded-full px-4 py-2 mb-8">
+          <span class="w-2 h-2 rounded-full bg-flame-500 animate-glow-pulse"></span>
+          <span class="text-sm font-medium text-base-300">Premium Store</span>
+        </div>
+        
+        <!-- Título principal -->
+        <h1 class="font-display font-bold text-6xl sm:text-8xl lg:text-9xl tracking-tight mb-6">
+          <span class="text-base-50">Agor</span><span class="text-gradient-flame">lab</span>
+        </h1>
+        
+        <!-- Línea decorativa -->
+        <div class="accent-line w-32 mx-auto mb-8"></div>
+        
+        <!-- Subtítulo -->
+        <p class="text-xl sm:text-2xl text-base-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+          Curamos productos excepcionales para personas que aprecian el detalle.
+          <span class="text-flame-400 font-medium">Diseño minimalista, calidad premium.</span>
+        </p>
+        
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button id="btn-enter-store" class="group bg-flame-600 hover:bg-flame-500 text-base-950 font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 hover:shadow-lg hover:shadow-flame-500/25 flex items-center gap-3">
+            Explorar tienda
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </button>
+          <button id="btn-view-catalog" class="bg-base-800 hover:bg-base-700 border border-base-700 text-base-200 font-medium px-8 py-4 rounded-xl text-lg transition">
+            Ver catálogo
+          </button>
+        </div>
+        
+        <!-- Stats -->
+        <div class="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          <div class="text-center">
+            <div class="font-display font-bold text-3xl text-flame-500">100+</div>
+            <div class="text-sm text-base-500 mt-1">Productos</div>
+          </div>
+          <div class="text-center">
+            <div class="font-display font-bold text-3xl text-flame-500">24h</div>
+            <div class="text-sm text-base-500 mt-1">Envío Express</div>
+          </div>
+          <div class="text-center">
+            <div class="font-display font-bold text-3xl text-flame-500">5★</div>
+            <div class="text-sm text-base-500 mt-1">Calificación</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Elementos decorativos flotantes -->
+      <div class="absolute top-20 left-10 w-20 h-20 bg-flame-500/10 rounded-2xl rotate-12 animate-float" style="animation-delay: 0s;"></div>
+      <div class="absolute bottom-32 right-16 w-16 h-16 bg-flame-500/10 rounded-full animate-float" style="animation-delay: 2s;"></div>
+      <div class="absolute top-1/3 right-1/4 w-12 h-12 bg-base-800 rounded-xl rotate-45 animate-float" style="animation-delay: 4s;"></div>
+    </div>
+  `;
+  
+  $('btn-enter-store').addEventListener('click', () => {
+    if (!state.user) {
+      openModal('modal-login');
+    } else {
+      renderMain();
+    }
+  });
+  
+  $('btn-view-catalog').addEventListener('click', () => {
+    if (!state.user) {
+      openModal('modal-login');
+    } else {
+      renderMain();
+      document.querySelector('#main')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+}
+
 // ============ PRODUCTS (Firestore realtime) ============
 const productsRef = collection(db, 'products');
 onSnapshot(productsRef, (snap) => {
   state.products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderMain();
+  if (state.user) renderMain();
 }, (err) => {
   console.error('Error productos:', err);
 });
@@ -266,12 +507,7 @@ onSnapshot(productsRef, (snap) => {
 function renderMain() {
   const main = $('main');
   if (!state.user) {
-    main.innerHTML = `
-      <div class="text-center py-20">
-        <h1 class="font-display font-bold text-5xl sm:text-7xl tracking-tight mb-6">Premium.<br/>Minimalista.</h1>
-        <p class="text-neutral-500 max-w-xl mx-auto">Curamos productos excepcionales para personas que aprecian el detalle.</p>
-      </div>
-    `;
+    renderHero();
     return;
   }
   main.innerHTML = '';
@@ -285,14 +521,24 @@ function renderAdminPanel(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
   section.innerHTML = `
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="font-display font-bold text-2xl">Panel de Administración</h2>
-      <div class="flex bg-neutral-100 rounded-full p-1">
-        <button data-tab="upload" class="admin-tab px-4 py-1.5 rounded-full text-sm font-medium ${state.adminTab === 'upload' ? 'bg-white shadow' : ''}">Subir producto</button>
-        <button data-tab="orders" class="admin-tab px-4 py-1.5 rounded-full text-sm font-medium ${state.adminTab === 'orders' ? 'bg-white shadow' : ''}">Órdenes</button>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <h2 class="font-display font-bold text-3xl flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-flame-500 animate-glow-pulse"></span>
+          Panel de Administración
+        </h2>
+        <p class="text-base-400 mt-1">Gestiona productos y órdenes de la tienda.</p>
+      </div>
+      <div class="flex bg-base-900 border border-base-800 rounded-full p-1">
+        <button data-tab="upload" class="admin-tab px-5 py-2 rounded-full text-sm font-medium transition ${state.adminTab === 'upload' ? 'bg-flame-600 text-base-950' : 'text-base-400 hover:text-base-200'}">
+          Subir producto
+        </button>
+        <button data-tab="orders" class="admin-tab px-5 py-2 rounded-full text-sm font-medium transition ${state.adminTab === 'orders' ? 'bg-flame-600 text-base-950' : 'text-base-400 hover:text-base-200'}">
+          Órdenes
+        </button>
       </div>
     </div>
-    <div id="admin-content" class="bg-ash rounded-2xl p-6 sm:p-8 border border-neutral-200"></div>
+    <div id="admin-content" class="bg-base-900 border border-base-800 rounded-2xl p-6 sm:p-8"></div>
   `;
   parent.appendChild(section);
 
@@ -312,24 +558,24 @@ function renderUploadForm(parent) {
   parent.innerHTML = `
     <form id="form-upload" class="grid sm:grid-cols-2 gap-5">
       <div class="sm:col-span-2">
-        <label class="text-sm font-medium text-neutral-700 block mb-1.5">Nombre del producto</label>
-        <input name="name" required class="w-full border border-neutral-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-ink/20" placeholder="Ej: Auriculares Pro"/>
+        <label class="text-sm font-medium text-base-300 block mb-1.5">Nombre del producto</label>
+        <input name="name" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="Ej: Auriculares Pro"/>
       </div>
       <div class="sm:col-span-2">
-        <label class="text-sm font-medium text-neutral-700 block mb-1.5">Descripción</label>
-        <textarea name="description" required rows="3" class="w-full border border-neutral-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-ink/20" placeholder="Descripción breve y atractiva..."></textarea>
+        <label class="text-sm font-medium text-base-300 block mb-1.5">Descripción</label>
+        <textarea name="description" required rows="3" class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="Descripción breve y atractiva..."></textarea>
       </div>
       <div>
-        <label class="text-sm font-medium text-neutral-700 block mb-1.5">Precio (ARS)</label>
-        <input name="price" type="number" min="0" required class="w-full border border-neutral-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-ink/20" placeholder="0"/>
+        <label class="text-sm font-medium text-base-300 block mb-1.5">Precio (ARS)</label>
+        <input name="price" type="number" min="0" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-flame-500/50 focus:border-flame-500 placeholder:text-base-600" placeholder="0"/>
       </div>
       <div>
-        <label class="text-sm font-medium text-neutral-700 block mb-1.5">Imagen</label>
-        <input name="image" type="file" accept="image/*" required class="w-full border border-neutral-300 rounded-xl px-4 py-2 bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-ink file:text-white file:text-sm file:font-medium"/>
+        <label class="text-sm font-medium text-base-300 block mb-1.5">Imagen</label>
+        <input name="image" type="file" accept="image/*" required class="w-full bg-base-800 border border-base-700 rounded-xl px-4 py-2.5 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-flame-600 file:text-base-950 file:text-sm file:font-bold hover:file:bg-flame-500 file:cursor-pointer cursor-pointer"/>
       </div>
       <div class="sm:col-span-2 flex items-center justify-between gap-3 mt-2">
-        <div id="upload-status" class="text-sm text-neutral-500"></div>
-        <button type="submit" class="bg-ink text-white px-6 py-2.5 rounded-xl font-medium hover:bg-neutral-800 transition disabled:bg-neutral-400">
+        <div id="upload-status" class="text-sm text-base-400"></div>
+        <button type="submit" class="bg-flame-600 hover:bg-flame-500 text-base-950 font-bold px-8 py-3 rounded-xl transition disabled:bg-base-700 disabled:text-base-500">
           Publicar producto
         </button>
       </div>
@@ -350,63 +596,83 @@ async function handleUploadProduct(e) {
   const btn = form.querySelector('button[type=submit]');
   const status = $('upload-status');
   btn.disabled = true;
-  status.textContent = 'Subiendo imagen...';
 
   try {
-    const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
+    if (!file || file.size === 0) throw new Error('Debes seleccionar una imagen válida');
+    if (file.size > 32 * 1024 * 1024) throw new Error('La imagen no puede superar los 32MB');
+    if (!file.type.startsWith('image/')) throw new Error('El archivo debe ser una imagen');
 
-    status.textContent = 'Guardando en la base de datos...';
+    status.textContent = 'Subiendo imagen...';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!imgbbRes.ok) {
+      const errData = await imgbbRes.json().catch(() => ({}));
+      throw new Error(errData.error?.message || 'Error al subir imagen');
+    }
+    
+    const imgbbData = await imgbbRes.json();
+    const imageUrl = imgbbData.data.url;
+
+    status.textContent = 'Guardando producto...';
     await addDoc(productsRef, {
-      name, description, price, image: url,
+      name, description,
+      price: Number(price),
+      image: imageUrl,
       createdAt: serverTimestamp()
     });
 
-    showToast('Producto publicado con éxito', 'success');
+    showToast('✓ Producto publicado con éxito', 'success');
     form.reset();
     status.textContent = '';
   } catch (err) {
-    console.error(err);
-    showToast('Error al publicar: ' + err.message, 'error');
-    status.textContent = 'Error';
+    console.error('Error:', err);
+    const msg = err.message || 'Error desconocido';
+    status.innerHTML = `<span class="text-red-500 font-medium">❌ ${msg}</span>`;
+    showToast('Error: ' + msg, 'error');
   } finally {
     btn.disabled = false;
   }
 }
 
 async function renderAdminOrders(parent) {
-  parent.innerHTML = '<div class="py-12 text-center text-neutral-500">Cargando órdenes...</div>';
+  parent.innerHTML = '<div class="py-12 text-center text-base-500">Cargando órdenes...</div>';
   try {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     if (orders.length === 0) {
-      parent.innerHTML = '<div class="py-12 text-center text-neutral-500">Aún no hay órdenes.</div>';
+      parent.innerHTML = '<div class="py-12 text-center text-base-500">Aún no hay órdenes.</div>';
       return;
     }
 
     parent.innerHTML = `
       <div class="space-y-3">
         ${orders.map(o => `
-          <div class="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5">
+          <div class="bg-base-800 border border-base-700 rounded-xl p-5 hover:border-flame-500/30 transition">
             <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <div class="font-semibold">${o.buyer?.name || 'Cliente'}</div>
-                <div class="text-xs text-neutral-500">${o.buyer?.email || ''}</div>
-                <div class="text-xs text-neutral-400 mt-1">CP: ${o.zip || '-'} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
+                <div class="font-semibold text-base-100">${o.buyer?.name || 'Cliente'}</div>
+                <div class="text-xs text-base-500">${o.buyer?.email || ''}</div>
+                <div class="text-xs text-base-600 mt-1">CP: ${o.zip || '-'} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
               </div>
               <div class="text-right">
-                <div class="font-display font-bold text-lg">${fmtMoney(o.total)}</div>
-                <span class="text-xs inline-block px-2 py-0.5 rounded-full ${o.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">${o.status || 'pending'}</span>
+                <div class="font-display font-bold text-xl text-flame-500">${fmtMoney(o.total)}</div>
+                <span class="text-xs inline-block px-2.5 py-1 rounded-full mt-1 ${o.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}">${o.status || 'pending'}</span>
               </div>
             </div>
-            <div class="border-t border-neutral-100 pt-3 space-y-1">
+            <div class="border-t border-base-700 pt-3 space-y-1.5">
               ${o.items.map(it => `
                 <div class="flex justify-between text-sm">
-                  <span>${it.quantity}× ${it.name}</span>
-                  <span class="text-neutral-600">${fmtMoney(it.price * it.quantity)}</span>
+                  <span class="text-base-300">${it.quantity}× ${it.name}</span>
+                  <span class="text-base-400">${fmtMoney(it.price * it.quantity)}</span>
                 </div>
               `).join('')}
             </div>
@@ -424,35 +690,41 @@ async function renderAdminOrders(parent) {
 function renderCatalog(parent) {
   const section = document.createElement('section');
   section.className = 'mb-12';
+  
   if (state.products.length === 0) {
     section.innerHTML = `
       <div class="text-center py-16">
-        <div class="text-5xl mb-4">📦</div>
-        <h2 class="font-display font-bold text-xl mb-1">Sin productos por ahora</h2>
-        <p class="text-neutral-500 text-sm">Vuelve pronto, estamos preparando novedades.</p>
+        <div class="text-6xl mb-4">📦</div>
+        <h2 class="font-display font-bold text-2xl mb-2">Sin productos por ahora</h2>
+        <p class="text-base-500">Vuelve pronto, estamos preparando novedades.</p>
       </div>
     `;
     parent.appendChild(section);
     return;
   }
+  
   section.innerHTML = `
-    <div class="mb-6">
-      <h2 class="font-display font-bold text-3xl tracking-tight">Catálogo</h2>
-      <p class="text-neutral-500 mt-1">Piezas seleccionadas para ti.</p>
+    <div class="mb-8">
+      <h2 class="font-display font-bold text-4xl tracking-tight flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-flame-500 animate-glow-pulse"></span>
+        Catálogo
+      </h2>
+      <p class="text-base-400 mt-2">Piezas seleccionadas para ti.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       ${state.products.map(p => `
-        <article class="group bg-white border border-neutral-200 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-          <div class="aspect-square bg-ash overflow-hidden">
+        <article class="group bg-base-900 border border-base-800 rounded-2xl overflow-hidden hover:border-flame-500/40 hover:shadow-xl hover:shadow-flame-500/5 transition-all duration-300">
+          <div class="aspect-square bg-base-800 overflow-hidden relative">
             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400?text=Imagen'"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-base-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
           <div class="p-5">
             <div class="flex items-start justify-between gap-3 mb-2">
-              <h3 class="font-display font-semibold text-lg leading-tight">${p.name}</h3>
-              <div class="font-bold whitespace-nowrap">${fmtMoney(p.price)}</div>
+              <h3 class="font-display font-semibold text-lg leading-tight group-hover:text-flame-400 transition-colors">${p.name}</h3>
+              <div class="font-bold text-flame-500 whitespace-nowrap">${fmtMoney(p.price)}</div>
             </div>
-            <p class="text-sm text-neutral-500 mb-4 line-clamp-2 min-h-[40px]">${p.description || ''}</p>
-            <button class="btn-add-to-cart w-full bg-ink text-white py-2.5 rounded-xl text-sm font-medium hover:bg-neutral-800 transition" data-id="${p.id}">
+            <p class="text-sm text-base-500 mb-4 line-clamp-2 min-h-[40px]">${p.description || ''}</p>
+            <button class="btn-add-to-cart w-full bg-base-800 hover:bg-flame-600 hover:text-base-950 text-base-200 py-3 rounded-xl text-sm font-bold transition-all duration-300 border border-base-700 hover:border-flame-500" data-id="${p.id}">
               Agregar al carrito
             </button>
           </div>
@@ -474,11 +746,14 @@ function renderMyOrders(parent) {
   section.id = 'my-orders-section';
   section.innerHTML = `
     <div class="mb-6">
-      <h2 class="font-display font-bold text-2xl">Mis órdenes</h2>
-      <p class="text-neutral-500 text-sm">Tu historial de compras.</p>
+      <h2 class="font-display font-bold text-2xl flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-flame-500"></span>
+        Mis órdenes
+      </h2>
+      <p class="text-base-500 text-sm mt-1">Tu historial de compras.</p>
     </div>
-    <div id="my-orders-content" class="bg-ash rounded-2xl p-6 border border-neutral-200">
-      <div class="py-8 text-center text-neutral-500 text-sm">Cargando...</div>
+    <div id="my-orders-content" class="bg-base-900 border border-base-800 rounded-2xl p-6">
+      <div class="py-8 text-center text-base-500 text-sm">Cargando...</div>
     </div>
   `;
   parent.appendChild(section);
@@ -488,21 +763,24 @@ function renderMyOrders(parent) {
     where('buyer.uid', '==', state.user.uid),
     orderBy('createdAt', 'desc')
   );
+  
   onSnapshot(q, (snap) => {
     const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     const container = $('my-orders-content');
+    
     if (orders.length === 0) {
-      container.innerHTML = '<div class="py-8 text-center text-neutral-500 text-sm">Aún no has realizado ninguna compra.</div>';
+      container.innerHTML = '<div class="py-8 text-center text-base-500 text-sm">Aún no has realizado ninguna compra.</div>';
       return;
     }
+    
     container.innerHTML = `<div class="space-y-3">${orders.map(o => `
-      <div class="bg-white border border-neutral-200 rounded-xl p-4">
+      <div class="bg-base-800 border border-base-700 rounded-xl p-4 hover:border-flame-500/30 transition">
         <div class="flex items-center justify-between mb-2">
-          <div class="text-xs text-neutral-500">${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
-          <span class="text-xs px-2 py-0.5 rounded-full ${o.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${o.status || 'pending'}</span>
+          <div class="text-xs text-base-500">${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
+          <span class="text-xs px-2.5 py-1 rounded-full ${o.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'}">${o.status || 'pending'}</span>
         </div>
-        <div class="font-semibold">${o.items.length} ${o.items.length === 1 ? 'producto' : 'productos'} · ${fmtMoney(o.total)}</div>
-        <div class="text-xs text-neutral-400 mt-1">CP: ${o.zip || '-'}</div>
+        <div class="font-semibold text-base-200">${o.items.length} ${o.items.length === 1 ? 'producto' : 'productos'} · <span class="text-flame-500 font-bold">${fmtMoney(o.total)}</span></div>
+        <div class="text-xs text-base-600 mt-1">CP: ${o.zip || '-'}</div>
       </div>
     `).join('')}</div>`;
   }, (err) => {
@@ -566,8 +844,8 @@ function renderCart() {
   if (state.cart.length === 0) {
     items.innerHTML = `
       <div class="text-center py-16">
-        <div class="text-5xl mb-4">🛒</div>
-        <p class="text-neutral-500">Tu carrito está vacío.</p>
+        <div class="text-6xl mb-4">🛒</div>
+        <p class="text-base-500">Tu carrito está vacío.</p>
       </div>
     `;
     footer.innerHTML = '';
@@ -575,21 +853,23 @@ function renderCart() {
   }
 
   items.innerHTML = `<div class="space-y-4">${state.cart.map(it => `
-    <div class="flex gap-3 pb-4 border-b border-neutral-100 last:border-0">
-      <img src="${it.image}" class="w-16 h-16 rounded-lg object-cover bg-ash" onerror="this.src='https://via.placeholder.com/64'"/>
+    <div class="flex gap-3 pb-4 border-b border-base-800 last:border-0">
+      <img src="${it.image}" class="w-16 h-16 rounded-lg object-cover bg-base-800" onerror="this.src='https://via.placeholder.com/64'"/>
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
-          <div class="font-medium text-sm truncate">${it.name}</div>
-          <button class="btn-remove-cart text-neutral-400 hover:text-red-500 transition flex-shrink-0" data-id="${it.id}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+          <div class="font-medium text-sm truncate text-base-200">${it.name}</div>
+          <button class="btn-remove-cart text-base-600 hover:text-red-500 transition flex-shrink-0" data-id="${it.id}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/>
+            </svg>
           </button>
         </div>
-        <div class="text-sm text-neutral-500 mt-0.5">${fmtMoney(it.price)}</div>
+        <div class="text-sm text-base-500 mt-0.5">${fmtMoney(it.price)}</div>
         <div class="flex items-center gap-2 mt-2">
-          <button class="btn-qty w-7 h-7 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition flex items-center justify-center" data-id="${it.id}" data-delta="-1">−</button>
-          <span class="text-sm font-medium w-6 text-center">${it.quantity}</span>
-          <button class="btn-qty w-7 h-7 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition flex items-center justify-center" data-id="${it.id}" data-delta="1">+</button>
-          <span class="ml-auto text-sm font-semibold">${fmtMoney(it.price * it.quantity)}</span>
+          <button class="btn-qty w-7 h-7 rounded-lg border border-base-700 hover:bg-base-700 transition flex items-center justify-center text-base-300" data-id="${it.id}" data-delta="-1">−</button>
+          <span class="text-sm font-medium w-6 text-center text-base-200">${it.quantity}</span>
+          <button class="btn-qty w-7 h-7 rounded-lg border border-base-700 hover:bg-base-700 transition flex items-center justify-center text-base-300" data-id="${it.id}" data-delta="1">+</button>
+          <span class="ml-auto text-sm font-bold text-flame-500">${fmtMoney(it.price * it.quantity)}</span>
         </div>
       </div>
     </div>
@@ -597,13 +877,13 @@ function renderCart() {
 
   footer.innerHTML = `
     <div class="flex items-center justify-between mb-4">
-      <span class="text-neutral-600">Subtotal</span>
-      <span class="font-display font-bold text-xl">${fmtMoney(cartTotal())}</span>
+      <span class="text-base-400">Subtotal</span>
+      <span class="font-display font-bold text-2xl text-flame-500">${fmtMoney(cartTotal())}</span>
     </div>
-    <button id="btn-checkout" class="w-full bg-ink text-white py-3 rounded-xl font-medium hover:bg-neutral-800 transition">
+    <button id="btn-checkout" class="w-full bg-flame-600 hover:bg-flame-500 text-base-950 font-bold py-3.5 rounded-xl transition">
       Continuar con la compra
     </button>
-    <p class="text-xs text-neutral-400 text-center mt-3">Envío calculado en el siguiente paso.</p>
+    <p class="text-xs text-base-600 text-center mt-3">Envío calculado en el siguiente paso.</p>
   `;
 
   items.querySelectorAll('.btn-qty').forEach(b => {
@@ -645,6 +925,7 @@ $('input-zip').addEventListener('input', (e) => {
   e.target.value = zip;
   const msg = $('zip-message');
   const btn = $('btn-pay-mp');
+  
   if (!zip) {
     msg.innerHTML = '';
     btn.disabled = true;
@@ -655,13 +936,14 @@ $('input-zip').addEventListener('input', (e) => {
     btn.disabled = true;
     return;
   }
+  
   if (VALID_ZIPS.includes(zip)) {
-    msg.innerHTML = `<span class="text-emerald-600 font-medium">✓ Envío Express Nacional habilitado para tu zona.</span>`;
-    msg.className = 'text-sm min-h-[20px] mb-4 text-emerald-600';
+    msg.innerHTML = `<span class="text-emerald-400 font-medium">✓ Envío Express Nacional habilitado para tu zona.</span>`;
+    msg.className = 'text-sm min-h-[20px] mb-4 text-emerald-400';
     btn.disabled = false;
   } else {
-    msg.innerHTML = `<span class="text-red-600 font-medium">✗ Temporalmente sin stock en el centro de distribución asignado a tu zona.</span>`;
-    msg.className = 'text-sm min-h-[20px] mb-4 text-red-600';
+    msg.innerHTML = `<span class="text-red-500 font-medium">✗ Temporalmente sin stock en el centro de distribución asignado a tu zona.</span>`;
+    msg.className = 'text-sm min-h-[20px] mb-4 text-red-500';
     btn.disabled = true;
   }
 });
@@ -684,7 +966,6 @@ async function handlePayWithMP() {
   btn.textContent = 'Procesando...';
 
   try {
-    // 1. Guardar orden en Firestore
     const orderData = {
       items: state.cart.map(it => ({
         id: it.id, name: it.name, price: it.price, quantity: it.quantity
@@ -701,7 +982,6 @@ async function handlePayWithMP() {
     };
     const orderRef = await addDoc(collection(db, 'orders'), orderData);
 
-    // 2. Crear preferencia en Mercado Pago
     const mpItems = state.cart.map(it => ({
       id: it.id,
       title: it.name,
@@ -727,10 +1007,7 @@ async function handlePayWithMP() {
         pending: window.location.origin + window.location.pathname
       },
       auto_return: 'approved',
-      metadata: {
-        zip: zip,
-        buyer_uid: state.user.uid
-      }
+      metadata: { zip: zip, buyer_uid: state.user.uid }
     };
 
     let initPoint = null;
@@ -747,15 +1024,11 @@ async function handlePayWithMP() {
       if (mpRes.ok) {
         const mpData = await mpRes.json();
         initPoint = mpData.init_point;
-      } else {
-        console.warn('MP response no OK:', await mpRes.text());
       }
     } catch (fetchErr) {
-      // Posible bloqueo CORS: MP no permite crear preferencias desde el navegador
       console.warn('Error al crear preferencia MP (posible CORS):', fetchErr);
     }
 
-    // Cerrar modal y limpiar carrito
     closeModal('modal-checkout');
     state.cart = [];
     saveCart();
@@ -765,8 +1038,7 @@ async function handlePayWithMP() {
       showToast('Redirigiendo a Mercado Pago...', 'success');
       setTimeout(() => window.location.href = initPoint, 800);
     } else {
-      showToast('Pedido registrado. Mercado Pago no pudo generar el checkout (CORS). Contacta soporte.', 'info');
-      // Opcional: podrías redirigir a un flujo alternativo
+      showToast('Pedido registrado. Mercado Pago no pudo generar el checkout (CORS).', 'info');
       setTimeout(() => renderMain(), 1500);
     }
 
@@ -779,8 +1051,15 @@ async function handlePayWithMP() {
 }
 
 // ============ INIT ============
+initTheme();
 updateCartBadge();
-renderMain();
+
+if (!state.user && !state.hasVisited) {
+  renderHero();
+} else if (!state.user) {
+  openModal('modal-login');
+  renderHero();
+}
 
 </script>
 </body>
