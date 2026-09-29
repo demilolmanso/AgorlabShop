@@ -1,1 +1,1 @@
-# AgorlabShop xd
+# AgorlabShop
