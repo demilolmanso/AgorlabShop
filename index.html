@@ -161,7 +161,7 @@
     </div>
     <div id="checkout-summary" class="text-sm space-y-2 mb-5"></div>
     <button id="btn-pay-mp" class="w-full btn-accent font-bold py-3.5 rounded-xl">Pagar con Mercado Pago</button>
-    <p class="text-xs text-faint text-center mt-3">Tu orden quedará registrada antes de redirigirte al pago.</p>
+    <p class="text-xs text-faint text-center mt-3">Tu orden quedará registrada y su estado se actualizará automáticamente al confirmarse el pago.</p>
   </div>
 </div>
 
@@ -304,18 +304,6 @@ const firebaseConfig = {
   messagingSenderId: "619711014107",
   appId: "1:619711014107:web:99e77ce286ddb9c91098fe"
 };
-
-/* =====================================================
-   ⚙️ CLOUDINARY — completá estos 2 valores
-   (Si ya los tenías en tu copia, volvelos a pegar acá)
-   ===================================================== */
-const CLOUDINARY_CLOUD_NAME   = "PEG_AQUI_TU_CLOUD_NAME";
-const CLOUDINARY_UPLOAD_PRESET = "PEG_AQUI_TU_PRESET_UNSIGNED";
-
-/* 🔐 El Access Token de Mercado Pago NO está en este archivo:
-   vive como secreto (MP_ACCESS_TOKEN) en el Worker de Cloudflare
-   "agorlab-api", al que llamamos por mismo origen: /api/crear-preferencia */
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -323,6 +311,11 @@ const provider = new GoogleAuthProvider();
 
 const ADMIN_EMAIL = "cepedademian2005@gmail.com";
 const SUPPORT_EMAIL = "contacto@agorlab.com";
+const API_BASE = ''; // mismo dominio (Pages Functions)
+
+const CLOUDINARY_CLOUD_NAME = "TU_CLOUD_NAME_AQUI";
+const CLOUDINARY_UPLOAD_PRESET = "TU_UPLOAD_PRESET_AQUI";
+
 const COVERAGE_ZONES = [
   { name: 'Mar del Plata',       lat: -38.0023, lng: -57.5575, radiusKm: 20 },
   { name: 'Santa Clara del Mar', lat: -37.8269, lng: -57.5546, radiusKm: 10 },
@@ -382,12 +375,8 @@ $('btn-theme-toggle').addEventListener('click', () => {
 });
 
 /* =====================================================
-   PIPELINE DE IMÁGENES (CLOUDINARY)
+   CLOUDINARY: subir imágenes
    ===================================================== */
-function cloudinaryConfigured() {
-  return !CLOUDINARY_CLOUD_NAME.startsWith('PEG_AQUI') && !CLOUDINARY_UPLOAD_PRESET.startsWith('PEG_AQUI');
-}
-
 function decodeImageFile(file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -425,25 +414,19 @@ async function reencodeToJpeg(file, maxDim = 1280) {
   }
 }
 
-function optimizeCloudinaryUrl(url) {
-  if (!url || !url.includes('/image/upload/')) return url;
-  return url.replace('/image/upload/', '/image/upload/w_1200,q_auto,f_auto/');
-}
-
 async function uploadBlobToCloudinary(blob, timeoutMs = 60000) {
-  if (!cloudinaryConfigured()) {
-    throw new Error('Falta configurar Cloudinary: completa CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET al inicio del script.');
-  }
   const fd = new FormData();
-  fd.append('file', blob, `agorlab-${Date.now()}.jpg`);
+  fd.append('file', blob);
   fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
+  
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res;
   try {
     res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST', body: fd, signal: controller.signal
+      method: 'POST',
+      body: fd,
+      signal: controller.signal
     });
   } catch (e) {
     if (e.name === 'AbortError') throw new Error('Tiempo de espera agotado al subir. Revisa tu conexión e intenta de nuevo.');
@@ -451,16 +434,14 @@ async function uploadBlobToCloudinary(blob, timeoutMs = 60000) {
   } finally {
     clearTimeout(timer);
   }
-
-  const json = await res.json().catch(() => null);
   if (!res.ok) {
-    let msg = json?.error?.message || `Cloudinary respondió con error ${res.status}.`;
-    if (/preset/i.test(msg)) msg += ' (Revisa que el upload preset exista y sea UNSIGNED.)';
-    throw new Error(msg);
+    const errText = await res.text();
+    throw new Error(`Cloudinary respondió con error ${res.status}: ${errText}`);
   }
-  const url = json?.secure_url || json?.url;
-  if (!url || !url.startsWith('https://')) throw new Error('Cloudinary no devolvió una URL usable.');
-  return optimizeCloudinaryUrl(url);
+  const json = await res.json();
+  const url = json.secure_url;
+  if (!url || !url.startsWith('https://')) throw new Error('Cloudinary no devolvió una URL válida.');
+  return url;
 }
 
 function checkImageLoadsOnce(url, timeoutMs = 10000) {
@@ -474,11 +455,11 @@ function checkImageLoadsOnce(url, timeoutMs = 10000) {
 }
 
 async function verifyImageUrl(url, onStatus = () => {}) {
-  const tries = 4;
+  const tries = 6;
   for (let i = 1; i <= tries; i++) {
     onStatus(`🔎 Verificando imagen (intento ${i}/${tries})...`);
     if (await checkImageLoadsOnce(url)) return true;
-    if (i < tries) await sleep(1500);
+    if (i < tries) await sleep(2500);
   }
   return false;
 }
@@ -496,7 +477,9 @@ async function processAndUploadImage(file, onStatus = () => {}) {
   console.log('🔗 URL de Cloudinary:', url);
 
   const verified = await verifyImageUrl(url, onStatus);
-  if (!verified) console.warn('⚠️ No se pudo verificar al instante; la URL es válida.');
+  if (!verified) {
+    console.warn('️ No se pudo verificar al instante. La URL es válida; el CDN puede tardar en propagarla.');
+  }
   return { url, verified };
 }
 
@@ -700,7 +683,7 @@ $('profile-photo-input').addEventListener('change', async (e) => {
     const res = await processAndUploadImage(file, (s) => showToast(s));
     state.profilePhotoUrl = res.url;
     $('profile-photo-preview').src = res.url;
-    showToast('✓ Foto lista. Se guardará con tu perfil.', 'success');
+    showToast(res.verified ? '✓ Foto lista.' : '✓ Foto subida. Puede tardar unos minutos en verse.', 'success');
   } catch (err) { showToast(err.message, 'error'); e.target.value = ''; }
 });
 $('btn-verify-address').addEventListener('click', async () => {
@@ -785,7 +768,7 @@ function renderHero(main) {
           <a href="#dato-agora" class="btn-ghost px-8 py-4 rounded-xl text-lg font-semibold">¿Qué es el ágora?</a>
         </div>
         <div id="dato-agora" class="bg-surface border border-app rounded-2xl p-8 max-w-2xl mx-auto text-left">
-          <div class="flex items-center gap-3 mb-4"><span class="text-3xl">🏛️</span><h3 class="font-display font-bold text-xl text-main">El ágora original</h3></div>
+          <div class="flex items-center gap-3 mb-4"><span class="text-3xl">️</span><h3 class="font-display font-bold text-xl text-main">El ágora original</h3></div>
           <p class="text-muted leading-relaxed mb-3">
             En la antigua Grecia, el <strong class="text-main">ágora</strong> (ἀγορά) era la plaza pública en el corazón de la polis. Allí se comerciaban bienes, se compartían ideas y se decidía el futuro de la comunidad. No era solo un mercado: era el <span class="text-accent font-medium">punto de encuentro</span> donde la ciudad sucedía.
           </p>
@@ -878,7 +861,7 @@ function renderUploadForm(parent) {
         <input name="price" type="number" min="0" required class="w-full input-app rounded-xl px-4 py-3" placeholder="0"/></div>
       <div><label class="text-sm font-medium text-muted block mb-1.5">Imagen (JPG, PNG o WebP)</label>
         <input name="image" type="file" accept="image/*" required class="w-full input-app rounded-xl px-4 py-2.5 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-accent file:text-sm file:font-bold file:cursor-pointer cursor-pointer"/>
-        <p class="text-xs text-faint mt-1">Se procesa, comprime y sube a Cloudinary automáticamente.</p></div>
+        <p class="text-xs text-faint mt-1">La imagen se procesa y comprime automáticamente antes de subirse.</p></div>
       <div class="sm:col-span-2">
         <label class="text-sm font-medium text-muted block mb-2">Etiquetas de categoría</label>
         <div id="tags-picker" class="flex flex-wrap gap-2 mb-3"></div>
@@ -921,7 +904,7 @@ async function handleUploadProduct(e) {
     const cats = [];
     for (const t of selectedTags) cats.push(await ensureCategory(t));
     await addDoc(productsRef, { name, description, price: Number(price), image: imageUrl, categories: cats, createdAt: serverTimestamp() });
-    showToast(verified ? '✓ Producto publicado' : '✓ Publicado. La imagen puede tardar unos segundos en verse.', 'success');
+    showToast(verified ? '✓ Producto publicado' : '✓ Publicado. La imagen puede tardar unos minutos en verse.', 'success');
     form.reset(); selectedTags = new Set(); status.textContent = '';
   } catch (err) {
     console.error(err);
@@ -1033,6 +1016,20 @@ async function deleteTag(id, name) {
   } catch (err) { showToast('Error: ' + err.message, 'error'); }
 }
 
+/* ============ STATUS CHIP ============ */
+function statusChip(status) {
+  const map = {
+    pending:  { label: 'Pendiente',  cls: 'bg-amber-500/10 text-amber-600 border-amber-500/40' },
+    approved: { label: 'Aprobado',   cls: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/40' },
+    rejected: { label: 'Rechazado',  cls: 'bg-red-500/10 text-red-600 border-red-500/40' },
+    refunded: { label: 'Reembolsado',cls: 'bg-sky-500/10 text-sky-600 border-sky-500/40' },
+    cancelled:{ label: 'Cancelado',  cls: 'bg-neutral-500/10 text-neutral-500 border-neutral-500/40' },
+    review:   { label: 'En revisión',cls: 'bg-violet-500/10 text-violet-600 border-violet-500/40' },
+  };
+  const s = map[status] || map.pending;
+  return `<span class="text-xs inline-block px-2.5 py-1 rounded-full border ${s.cls}">${s.label}</span>`;
+}
+
 async function renderAdminOrders(parent) {
   parent.innerHTML = '<div class="py-12 text-center text-muted">Cargando órdenes...</div>';
   try {
@@ -1045,12 +1042,12 @@ async function renderAdminOrders(parent) {
           <div>
             <div class="font-semibold text-main">${o.buyer?.name || 'Cliente'} ${o.buyer?.nickname ? `(@${o.buyer.nickname})` : ''}</div>
             <div class="text-xs text-muted">${o.buyer?.email || ''}</div>
-            <div class="text-xs text-faint mt-1">📍 ${o.delivery?.address || 'Sin dirección'} · ${o.delivery?.city || ''}</div>
+            <div class="text-xs text-faint mt-1"> ${o.delivery?.address || 'Sin dirección'} · ${o.delivery?.city || ''}</div>
             <div class="text-xs text-faint">📱 ${o.delivery?.whatsapp || ''} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
           </div>
           <div class="text-right">
             <div class="font-display font-bold text-xl text-accent">${fmtMoney(o.total)}</div>
-            <span class="text-xs inline-block px-2.5 py-1 rounded-full mt-1 bg-accent-soft text-accent border border-accent">${o.status || 'pending'}</span>
+            ${statusChip(o.status)}
           </div>
         </div>
         <div class="border-t border-app pt-3 space-y-1.5">
@@ -1076,7 +1073,7 @@ function renderCatalog(parent) {
     </div>` : ''}
     ${filtered.length === 0 ? `
       <div class="text-center py-16">
-        <div class="text-6xl mb-4">🏺</div>
+        <div class="text-6xl mb-4"></div>
         <h3 class="font-display font-bold text-2xl mb-2 text-main">Nada por aquí todavía</h3>
         <p class="text-muted">El ágora se está llenando. Vuelve pronto.</p>
       </div>` : `
@@ -1139,7 +1136,7 @@ function renderMyOrders(parent) {
         <div class="bg-surface2 border border-app rounded-xl p-4 hover:border-accent transition">
           <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-faint">${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
-            <span class="text-xs px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent">${o.status || 'pending'}</span>
+            ${statusChip(o.status)}
           </div>
           <div class="font-semibold text-main">${o.items.length} producto${o.items.length === 1 ? '' : 's'} · <span class="text-accent font-bold">${fmtMoney(o.total)}</span></div>
           <div class="text-xs text-faint mt-1">📍 ${o.delivery?.address || ''}</div>
@@ -1233,7 +1230,7 @@ $('btn-close-cart').addEventListener('click', () => closeModal('modal-cart'));
 $('cart-backdrop').addEventListener('click', () => closeModal('modal-cart'));
 $('btn-close-checkout').addEventListener('click', () => closeModal('modal-checkout'));
 
-/* ============ PAGO: ahora vía nuestro Worker (sin secretos en el navegador) ============ */
+/* ============ PAGO CON MP (vía proxy) ============ */
 $('btn-pay-mp').addEventListener('click', async () => {
   if (!state.user || !state.profile) return;
   const btn = $('btn-pay-mp');
@@ -1247,8 +1244,13 @@ $('btn-pay-mp').addEventListener('click', async () => {
       status: 'pending',
       createdAt: serverTimestamp()
     });
+
     const preferenceBody = {
-      items: state.cart.map(i => ({ id: i.id, title: i.name, description: i.name, picture_url: i.image, category_id: 'general', quantity: i.quantity, currency_id: 'ARS', unit_price: Number(i.price) })),
+      items: state.cart.map(i => ({
+        id: i.id, title: i.name, description: i.name,
+        picture_url: i.image, category_id: 'general',
+        quantity: i.quantity, unit_price: Number(i.price)
+      })),
       payer: { name: state.profile.nickname, email: state.user.email },
       external_reference: orderRef.id,
       back_urls: {
@@ -1256,38 +1258,26 @@ $('btn-pay-mp').addEventListener('click', async () => {
         failure: window.location.origin + window.location.pathname,
         pending: window.location.origin + window.location.pathname
       },
-      auto_return: 'approved',
       metadata: { buyer_uid: state.user.uid, city: state.profile.city }
     };
 
-    let initPoint = null;
-    try {
-      const mpRes = await fetch('/api/crear-preferencia', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferenceBody)
-      });
-      if (mpRes.ok) {
-        const mpData = await mpRes.json();
-        initPoint = mpData.init_point || mpData.sandbox_init_point;
-      } else {
-        const errData = await mpRes.json().catch(() => null);
-        console.error('Backend de pago respondió:', mpRes.status, errData);
-        showToast(errData?.error || 'Error al crear el pago.', 'error');
-      }
-    } catch (e) {
-      console.warn('No se pudo contactar al backend de pago:', e);
+    const apiRes = await fetch(`${API_BASE}/api/crear-preferencia`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preferenceBody),
+    });
+    const data = await apiRes.json();
+
+    if (!apiRes.ok || !data.init_point) {
+      throw new Error(data.error || 'No se pudo crear la preferencia');
     }
 
+    sessionStorage.setItem('agorlab_last_order', orderRef.id);
     closeModal('modal-checkout');
     state.cart = []; saveCart(); updateCartBadge();
-    if (initPoint) {
-      showToast('Redirigiendo a Mercado Pago...', 'success');
-      setTimeout(() => window.location.href = initPoint, 800);
-    } else {
-      showToast('Orden registrada. No se pudo generar el checkout de MP.', 'info');
-      setTimeout(render, 1500);
-    }
+
+    showToast('Redirigiendo a Mercado Pago...', 'success');
+    setTimeout(() => window.location.href = data.init_point, 600);
   } catch (err) {
     console.error(err);
     showToast('Error al procesar el pago: ' + err.message, 'error');
@@ -1295,7 +1285,67 @@ $('btn-pay-mp').addEventListener('click', async () => {
   }
 });
 
-/* ============ SOPORTE ============ */
+/* ============ RETORNO DE MP ============ */
+async function handleMpReturn() {
+  const url = new URL(window.location.href);
+  const paymentId = url.searchParams.get('payment_id') || url.searchParams.get('collection_id');
+  const status = url.searchParams.get('status') || url.searchParams.get('collection_status');
+  const orderId = sessionStorage.getItem('agorlab_last_order');
+
+  if (!orderId) return;
+
+  if (url.searchParams.toString()) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/sync-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, paymentId }),
+    });
+    const data = await res.json();
+
+    if (status === 'approved' || data.status === 'approved') {
+      showPaymentBanner('success', '✓ Pago aprobado. Gracias por tu compra en el ágora.');
+    } else if (status === 'rejected') {
+      showPaymentBanner('error', '✗ Pago rechazado. Puedes intentarlo nuevamente.');
+    } else if (data.status === 'pending' || data.status === 'review') {
+      showPaymentBanner('info', '⏳ Pago en proceso. Te avisaremos cuando se confirme.');
+    } else if (data.status === 'refunded') {
+      showPaymentBanner('info', '↩ Pago reembolsado.');
+    }
+  } catch (e) {
+    console.warn('sync-order error:', e);
+  } finally {
+    sessionStorage.removeItem('agorlab_last_order');
+  }
+}
+
+function showPaymentBanner(type, message) {
+  const main = $('main');
+  const colors = {
+    success: 'bg-emerald-500/10 border-emerald-500 text-emerald-600',
+    error:   'bg-red-500/10 border-red-500 text-red-600',
+    info:    'bg-accent-soft border-accent text-main',
+  };
+  const dark = document.documentElement.classList.contains('dark');
+  const darkColors = {
+    success: 'bg-emerald-500/10 border-emerald-500 text-emerald-400',
+    error:   'bg-red-500/10 border-red-500 text-red-400',
+    info:    'bg-accent-soft border-accent text-main',
+  };
+  const c = dark ? darkColors[type] : colors[type];
+  const banner = document.createElement('div');
+  banner.className = `${c} border rounded-2xl p-5 mb-6 flex items-center justify-between gap-3 animate-slide-up`;
+  banner.innerHTML = `
+    <p class="text-sm font-medium">${message}</p>
+    <button class="text-xs underline opacity-70 hover:opacity-100">Cerrar</button>`;
+  banner.querySelector('button').addEventListener('click', () => banner.remove());
+  main.prepend(banner);
+  setTimeout(() => banner.remove(), 15000);
+}
+
 function openSupport() { $('support-contact').value = state.profile?.whatsapp || ''; openModal('modal-support'); }
 $('btn-support').addEventListener('click', openSupport);
 $('btn-support-footer').addEventListener('click', openSupport);
@@ -1311,6 +1361,7 @@ $('btn-send-support').addEventListener('click', () => {
 });
 
 updateCartBadge();
+handleMpReturn();
 render();
 </script>
 </body>
