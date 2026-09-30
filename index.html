@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Agorlab — El ágora digital</title>
+<title>Agorlab — Tienda online con envíos a domicilio</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -85,7 +85,6 @@
   .dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) grayscale(.2); }
   .leaflet-container { background: var(--surface2); font-family: 'Inter', sans-serif; }
 
-  /* Banners de estado de pago */
   .payment-banner {
     animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
@@ -120,7 +119,7 @@
 
 <footer class="border-t border-app mt-20 py-10 text-center text-sm text-muted">
   <div class="font-display font-semibold text-main mb-1">Agor<span class="text-accent">lab</span></div>
-  <p class="mb-1">El ágora digital — inspirada en la ἀγορά de la antigua Grecia.</p>
+  <p class="mb-1">Tienda online con envíos a domicilio.</p>
   <p>&copy; 2026 Agorlab. <button id="btn-support-footer" class="underline text-accent">Soporte</button></p>
 </footer>
 
@@ -131,8 +130,8 @@
       <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center">
         <svg class="w-8 h-8" style="color: var(--on-accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       </div>
-      <div class="font-display font-bold text-3xl mb-2 text-main">Entrar al ágora</div>
-      <p class="text-muted text-sm">Un punto de encuentro abierto. Inicia sesión para participar del intercambio.</p>
+      <div class="font-display font-bold text-3xl mb-2 text-main">Iniciá sesión</div>
+      <p class="text-muted text-sm">Comprá fácil y recibí en tu domicilio.</p>
     </div>
     <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 btn-ghost py-3.5 px-4 rounded-xl font-medium">
       <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -176,12 +175,12 @@
 <div id="modal-profile" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" style="background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(8px);">
   <div class="bg-surface border border-app rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-slide-up my-8">
     <div class="flex items-center justify-between mb-2">
-      <h2 class="font-display font-bold text-2xl text-main" id="profile-title">Crea tu perfil</h2>
+      <h2 class="font-display font-bold text-2xl text-main" id="profile-title">Tu perfil</h2>
       <button id="btn-close-profile" class="p-2 rounded-full btn-ghost !border-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <p class="text-sm text-muted mb-6">Tu perfil de ciudadano del ágora: cómo te llamamos, dónde te encontramos y dónde entregamos.</p>
+    <p class="text-sm text-muted mb-6">Completá tus datos para recibir tus compras en tu domicilio.</p>
     <form id="form-profile" class="grid sm:grid-cols-2 gap-5">
       <div class="sm:col-span-2 flex items-center gap-4">
         <img id="profile-photo-preview" src="" alt="" class="w-16 h-16 rounded-full object-cover border-2 border-app bg-surface2"/>
@@ -194,7 +193,6 @@
       <div>
         <label class="text-sm font-medium text-muted block mb-1.5">Apodo *</label>
         <input id="profile-nickname" required minlength="3" maxlength="20" class="w-full input-app rounded-xl px-4 py-3" placeholder="Ej: demian"/>
-        <p class="text-xs text-faint mt-1">Lo usaremos para tu futuro correo <span class="text-accent">@agorlab.com</span></p>
       </div>
       <div>
         <label class="text-sm font-medium text-muted block mb-1.5">WhatsApp *</label>
@@ -210,11 +208,11 @@
       <div class="sm:col-span-2">
         <div id="profile-map" class="h-64 rounded-xl border border-app overflow-hidden z-0"></div>
         <div id="map-message" class="text-sm mt-2 min-h-[22px]"></div>
-        <p class="text-xs text-faint mt-1">Cobertura actual: <span class="text-accent font-medium">Mar del Plata, Santa Clara del Mar y Miramar</span>. Click en el mapa para ajustar la ubicación exacta.</p>
+        <p class="text-xs text-faint mt-1">Zonas de envío: <span class="text-accent font-medium">Mar del Plata, Santa Clara del Mar y Miramar</span>. Click en el mapa para ajustar la ubicación exacta.</p>
       </div>
       <div class="sm:col-span-2 flex justify-end gap-3 mt-2">
         <button type="button" id="btn-profile-cancel" class="btn-ghost px-6 py-3 rounded-xl font-semibold">Cancelar</button>
-        <button type="submit" id="btn-profile-save" class="btn-accent px-8 py-3 rounded-xl font-bold" disabled>Confirmar ubicación y guardar</button>
+        <button type="submit" id="btn-profile-save" class="btn-accent px-8 py-3 rounded-xl font-bold" disabled>Guardar</button>
       </div>
     </form>
   </div>
@@ -271,7 +269,7 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <p class="text-sm text-muted mb-4">Escríbenos a <span class="text-accent font-semibold">contacto@agorlab.com</span>. Respondemos todas las consultas del ágora.</p>
+    <p class="text-sm text-muted mb-4">Escríbenos a <span class="text-accent font-semibold">contacto@agorlab.com</span>. Respondemos todas las consultas.</p>
     <div class="bg-accent-soft border border-accent rounded-xl p-3 mb-4 text-sm text-main">
       ⚠️ <strong>Importante:</strong> debes incluir un <strong>contacto telefónico / WhatsApp</strong> en tu mensaje para poder recibir una respuesta.
     </div>
@@ -412,7 +410,7 @@ async function reencodeToJpeg(file, maxDim = 1280) {
     ctx.drawImage(img, 0, 0, w, h);
     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
     if (!blob || blob.size === 0) throw new Error('No se pudo procesar la imagen en el navegador.');
-    console.log(`️ Re-codificada: ${w0}x${h0} → ${w}x${h} · ${(blob.size/1024).toFixed(0)} KB`);
+    console.log(`🖼️ Re-codificada: ${w0}x${h0} → ${w}x${h} · ${(blob.size/1024).toFixed(0)} KB`);
     return blob;
   } finally {
     URL.revokeObjectURL(url);
@@ -467,9 +465,9 @@ async function processAndUploadImage(file, onStatus = () => {}) {
   onStatus('🖼️ Procesando imagen...');
   const blob = await reencodeToJpeg(file);
 
-  onStatus('📤 Subiendo a Cloudinary...');
+  onStatus(' Subiendo a Cloudinary...');
   const url = await uploadBlobToCloudinary(blob);
-  console.log(' URL de Cloudinary:', url);
+  console.log('🔗 URL de Cloudinary:', url);
 
   const verified = await verifyImageUrl(url, onStatus);
   return { url, verified };
@@ -492,7 +490,7 @@ $('btn-google-login').addEventListener('click', async () => {
   try {
     await signInWithPopup(auth, provider);
     closeModal('modal-login');
-    showToast('✓ Sesión iniciada. Preparando tu ágora...', 'success');
+    showToast('✓ Sesión iniciada.', 'success');
   } catch (err) {
     console.error('Error login:', err);
     const msg = err.code === 'auth/popup-closed-by-user' ? 'Cerraste la ventana de acceso.'
@@ -629,14 +627,14 @@ function evaluateGeo(lat, lng, addr, displayName) {
   const zone = checkCoverage(lat, lng, addr);
   if (zone) {
     state.geoResult = { lat, lng, zone: zone.name, status: 'covered', displayName };
-    setGeoMessage(`✓ Ubicación confirmada en <strong>${zone.name}</strong>. Envío disponible.`, 'ok');
+    setGeoMessage(`✓ Envío disponible a <strong>${zone.name}</strong>.`, 'ok');
     $('btn-profile-save').disabled = false;
-    $('btn-profile-save').textContent = 'Confirmar ubicación y guardar';
+    $('btn-profile-save').textContent = 'Guardar';
   } else {
     state.geoResult = { lat, lng, zone: null, status: 'waitlist', displayName };
-    setGeoMessage(`✗ Fuera de nuestra cobertura actual. Serás agregado a la <strong>lista de espera</strong> de tu zona.`, 'bad');
+    setGeoMessage(`✗ Sin envíos a tu zona todavía. Te avisaremos cuando habilitemos tu localidad.`, 'bad');
     $('btn-profile-save').disabled = false;
-    $('btn-profile-save').textContent = 'Unirme a lista de espera y guardar';
+    $('btn-profile-save').textContent = 'Guardar';
   }
 }
 
@@ -647,16 +645,15 @@ function openProfileModal(isEdit) {
   $('profile-nickname').value = state.profile?.nickname || '';
   $('profile-whatsapp').value = state.profile?.whatsapp || '';
   $('profile-address').value = state.profile?.address || '';
-  $('profile-title').textContent = isEdit && state.profile ? 'Edita tu perfil' : 'Crea tu perfil';
+  $('profile-title').textContent = isEdit && state.profile ? 'Editá tu perfil' : 'Completá tu perfil';
   $('btn-profile-save').disabled = true;
-  $('btn-profile-save').textContent = 'Confirmar ubicación y guardar';
+  $('btn-profile-save').textContent = 'Guardar';
   if (state.profile?.location) {
-    setGeoMessage(`Ubicación guardada: <strong>${state.profile.city}</strong> (${state.profile.zone === 'covered' ? 'con envío' : 'lista de espera'}). Verifica nuevamente si cambias tu dirección.`, 'muted');
+    setGeoMessage(`Dirección guardada: <strong>${state.profile.city}</strong> (${state.profile.zone === 'covered' ? 'con envío' : 'sin envío disponible'}). Verificá nuevamente si cambiás tu dirección.`, 'muted');
     state.geoResult = { lat: state.profile.location.lat, lng: state.profile.location.lng, zone: state.profile.zone === 'covered' ? state.profile.city : null, status: state.profile.zone };
     $('btn-profile-save').disabled = false;
-    $('btn-profile-save').textContent = state.profile.zone === 'covered' ? 'Confirmar ubicación y guardar' : 'Unirme a lista de espera y guardar';
   } else {
-    setGeoMessage('Verifica tu dirección para verla en el mapa.', 'muted');
+    setGeoMessage('Verificá tu dirección para verla en el mapa.', 'muted');
   }
   openModal('modal-profile');
   setTimeout(() => {
@@ -678,13 +675,13 @@ $('profile-photo-input').addEventListener('change', async (e) => {
 });
 $('btn-verify-address').addEventListener('click', async () => {
   const address = $('profile-address').value.trim();
-  if (!address) { showToast('Escribe tu dirección primero', 'error'); return; }
+  if (!address) { showToast('Escribí tu dirección primero', 'error'); return; }
   const btn = $('btn-verify-address');
   btn.disabled = true; btn.textContent = 'Buscando...';
   try {
     const result = await geocodeAddress(address);
     if (!result) {
-      setGeoMessage('✗ No encontramos esa dirección. Prueba con más detalle (calle, número, ciudad).', 'bad');
+      setGeoMessage('✗ No encontramos esa dirección. Probá con más detalle (calle, número, ciudad).', 'bad');
       state.geoResult = null; $('btn-profile-save').disabled = true;
       return;
     }
@@ -692,12 +689,12 @@ $('btn-verify-address').addEventListener('click', async () => {
     leafletMarker.setLatLng([lat, lng]);
     leafletMap.setView([lat, lng], 15);
     evaluateGeo(lat, lng, result.address || {}, result.display_name || '');
-  } catch { setGeoMessage('✗ Error al consultar el mapa. Intenta de nuevo.', 'bad'); }
+  } catch { setGeoMessage('✗ Error al consultar el mapa. Intentá de nuevo.', 'bad'); }
   finally { btn.disabled = false; btn.textContent = 'Verificar en mapa'; }
 });
 $('form-profile').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!state.geoResult) { showToast('Primero verifica tu dirección en el mapa', 'error'); return; }
+  if (!state.geoResult) { showToast('Primero verificá tu dirección en el mapa', 'error'); return; }
   const nickname = $('profile-nickname').value.trim();
   const whatsapp = $('profile-whatsapp').value.trim();
   const address = $('profile-address').value.trim();
@@ -715,7 +712,7 @@ $('form-profile').addEventListener('submit', async (e) => {
       createdAt: state.profile?.createdAt || serverTimestamp()
     }, { merge: true });
     closeModal('modal-profile');
-    showToast(state.geoResult.status === 'covered' ? '✓ Perfil guardado. ¡Bienvenido al ágora!' : 'Perfil guardado. Estás en lista de espera para tu zona.', state.geoResult.status === 'covered' ? 'success' : 'info');
+    showToast(state.geoResult.status === 'covered' ? '✓ Perfil guardado.' : 'Perfil guardado. Te avisaremos cuando habilitemos envíos a tu zona.', state.geoResult.status === 'covered' ? 'success' : 'info');
   } catch (err) {
     console.error(err);
     showToast('Error al guardar perfil: ' + err.message, 'error');
@@ -743,31 +740,30 @@ function renderHero(main) {
       <div class="relative z-10 max-w-4xl mx-auto animate-slide-up px-4">
         <div class="inline-flex items-center gap-2 bg-surface border border-app rounded-full px-4 py-2 mb-8">
           <span class="w-2 h-2 rounded-full bg-accent animate-glow-pulse"></span>
-          <span class="text-sm font-medium text-muted">El punto de encuentro del intercambio</span>
+          <span class="text-sm font-medium text-muted">Tienda online con envíos a domicilio</span>
         </div>
         <h1 class="font-display font-bold text-6xl sm:text-8xl lg:text-9xl tracking-tight mb-6 text-main">Agor<span class="text-gradient-flame">lab</span></h1>
         <div class="accent-line w-32 mx-auto mb-8"></div>
         <p class="text-xl sm:text-2xl text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-          Un <span class="text-accent font-semibold">ágora digital</span>: el lugar abierto donde las personas se encuentran, intercambian y deciden qué circula.
+          Comprá online y recibí en tu casa. <span class="text-accent font-semibold">Simple, rápido y seguro.</span>
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <button id="btn-enter" class="btn-accent font-bold px-8 py-4 rounded-xl text-lg flex items-center gap-3 shadow-lg">
-            Entrar al ágora
+            Empezar a comprar
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </button>
-          <a href="#dato-agora" class="btn-ghost px-8 py-4 rounded-xl text-lg font-semibold">¿Qué es el ágora?</a>
+          <a href="#dato-agora" class="btn-ghost px-8 py-4 rounded-xl text-lg font-semibold">Conocé Agorlab</a>
         </div>
         <div id="dato-agora" class="bg-surface border border-app rounded-2xl p-8 max-w-2xl mx-auto text-left">
-          <div class="flex items-center gap-3 mb-4"><span class="text-3xl">🏛️</span><h3 class="font-display font-bold text-xl text-main">El ágora original</h3></div>
-          <p class="text-muted leading-relaxed mb-3">
-            En la antigua Grecia, el <strong class="text-main">ágora</strong> (ἀγορά) era la plaza pública en el corazón de la polis. Allí se comerciaban bienes, se compartían ideas y se decidía el futuro de la comunidad. No era solo un mercado: era el <span class="text-accent font-medium">punto de encuentro</span> donde la ciudad sucedía.
+          <div class="flex items-center gap-3 mb-4"><span class="text-3xl">🏛️</span><h3 class="font-display font-bold text-xl text-main">¿Por qué Agorlab?</h3></div>
+          <p class="text-muted leading-relaxed">
+            El nombre viene del <strong class="text-main">ágora</strong> (ἀγορά), la plaza pública de la antigua Grecia donde la gente se encontraba para comerciar. Tomamos esa idea y la traemos al presente: una tienda online donde comprás fácil y recibís en tu domicilio.
           </p>
-          <p class="text-muted leading-relaxed">Agorlab toma ese espíritu y lo trae al presente: una plaza abierta y digital donde el intercambio vuelve a ser encuentro.</p>
         </div>
         <div class="mt-14 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-          <div><div class="font-display font-bold text-3xl text-accent">3</div><div class="text-sm text-faint mt-1">ciudades con envío</div></div>
-          <div><div class="font-display font-bold text-3xl text-accent">24/7</div><div class="text-sm text-faint mt-1">ágora abierta</div></div>
-          <div><div class="font-display font-bold text-3xl text-accent">1</div><div class="text-sm text-faint mt-1">punto de encuentro</div></div>
+          <div><div class="font-display font-bold text-3xl text-accent">3</div><div class="text-sm text-faint mt-1">zonas de envío</div></div>
+          <div><div class="font-display font-bold text-3xl text-accent">24/7</div><div class="text-sm text-faint mt-1">tienda abierta</div></div>
+          <div><div class="font-display font-bold text-3xl text-accent">100%</div><div class="text-sm text-faint mt-1">pago seguro</div></div>
         </div>
       </div>
     </div>`;
@@ -778,14 +774,14 @@ function renderBanners(parent) {
   if (!state.profile) {
     parent.insertAdjacentHTML('beforeend', `
       <div class="bg-accent-soft border border-accent rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <p class="text-sm text-main">📋 <strong>Completa tu perfil</strong> (foto, apodo, WhatsApp y dirección) para habilitar tus compras.</p>
+        <p class="text-sm text-main">📋 <strong>Completá tu perfil</strong> (foto, apodo, WhatsApp y dirección) para habilitar tus compras.</p>
         <button id="btn-banner-profile" class="btn-accent px-5 py-2 rounded-xl text-sm font-bold whitespace-nowrap">Completar perfil</button>
       </div>`);
     $('btn-banner-profile').addEventListener('click', () => openProfileModal(false));
   } else if (state.profile.zone === 'waitlist') {
     parent.insertAdjacentHTML('beforeend', `
       <div class="bg-accent-soft border border-accent rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <p class="text-sm text-main">⏳ Estás en <strong>lista de espera</strong>: aún no enviamos a <strong>${state.profile.city}</strong>. Te avisaremos al habilitar tu zona.</p>
+        <p class="text-sm text-main">⏳ <strong>Sin envíos a tu zona</strong> todavía. Te avisaremos cuando habilitemos <strong>${state.profile.city}</strong>.</p>
         <button id="btn-banner-edit" class="btn-ghost px-5 py-2 rounded-xl text-sm font-bold whitespace-nowrap">Cambiar dirección</button>
       </div>`);
     $('btn-banner-edit').addEventListener('click', () => openProfileModal(true));
@@ -800,7 +796,7 @@ function renderAdminPanel(parent) {
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
       <div>
         <h2 class="font-display font-bold text-3xl text-main flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-accent animate-glow-pulse"></span> Panel de Administración</h2>
-        <p class="text-muted mt-1">Gestiona el ágora: productos, etiquetas, órdenes y despachos.</p>
+        <p class="text-muted mt-1">Gestiona productos, etiquetas, órdenes y despachos.</p>
       </div>
       <div class="flex bg-surface border border-app rounded-full p-1 flex-wrap gap-1">
         ${['upload', 'tags', 'orders', 'despachos'].map(t => `
@@ -823,7 +819,6 @@ function renderAdminPanel(parent) {
 function renderDespachos(parent) {
   parent.innerHTML = '<div class="py-12 text-center text-muted">Cargando pedidos para despachar...</div>';
   
-  // Escuchar órdenes en tiempo real
   const q = query(collection(db, 'orders'), where('status', '==', 'approved'), orderBy('createdAt', 'desc'));
   
   onSnapshot(q, (snap) => {
@@ -832,7 +827,7 @@ function renderDespachos(parent) {
     if (orders.length === 0) {
       parent.innerHTML = `
         <div class="text-center py-16">
-          <div class="text-6xl mb-4"></div>
+          <div class="text-6xl mb-4">📦</div>
           <h3 class="font-display font-bold text-2xl mb-2 text-main">Sin pedidos pendientes</h3>
           <p class="text-muted">Cuando alguien pague, aparecerá acá listo para despachar.</p>
         </div>`;
@@ -897,7 +892,6 @@ function renderDespachos(parent) {
         `).join('')}
       </div>`;
 
-    // Event listeners para botones de despachar
     parent.querySelectorAll('[data-despachar]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const orderId = btn.dataset.despachar;
@@ -953,7 +947,7 @@ async function renderAdminOrders(parent) {
           <div>
             <div class="font-semibold text-main">${o.buyer?.name || 'Cliente'} ${o.buyer?.nickname ? `(@${o.buyer.nickname})` : ''}</div>
             <div class="text-xs text-muted">${o.buyer?.email || ''}</div>
-            <div class="text-xs text-faint mt-1"> ${o.delivery?.address || 'Sin dirección'} · ${o.delivery?.city || ''}</div>
+            <div class="text-xs text-faint mt-1"> 📍 ${o.delivery?.address || 'Sin dirección'} · ${o.delivery?.city || ''}</div>
             <div class="text-xs text-faint">📱 ${o.delivery?.whatsapp || ''} · ${o.createdAt?.toDate ? new Date(o.createdAt.toDate()).toLocaleString('es-AR') : ''}</div>
           </div>
           <div class="text-right">
@@ -975,7 +969,7 @@ function renderTagsPicker(containerId = 'tags-picker') {
   container.innerHTML = [...all].map(name => `
     <button type="button" data-tag="${name}" class="tag-chip px-4 py-1.5 rounded-full text-sm font-semibold border transition ${selectedTags.has(name) ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">
       ${selectedTags.has(name) ? '✓ ' : ''}${name}
-    </button>`).join('') || '<span class="text-sm text-faint">Sin etiquetas aún. Crea la primera.</span>';
+    </button>`).join('') || '<span class="text-sm text-faint">Sin etiquetas aún. Creá la primera.</span>';
   container.querySelectorAll('.tag-chip').forEach(b => {
     b.addEventListener('click', () => {
       const t = b.dataset.tag;
@@ -1119,7 +1113,7 @@ function renderTagsManager(parent) {
     <div id="tags-list" class="space-y-2"></div>`;
   const list = $('tags-list');
   if (!state.categories.length) {
-    list.innerHTML = '<p class="text-muted text-sm py-6 text-center">Aún no hay etiquetas. Crea la primera arriba.</p>';
+    list.innerHTML = '<p class="text-muted text-sm py-6 text-center">Aún no hay etiquetas. Creá la primera arriba.</p>';
   } else {
     list.innerHTML = state.categories.map(c => {
       const count = state.products.filter(p => (p.categories || []).includes(c.name)).length;
@@ -1164,18 +1158,18 @@ function renderCatalog(parent) {
   section.innerHTML = `
     <div class="mb-6">
       <h2 class="font-display font-bold text-4xl tracking-tight text-main flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-accent animate-glow-pulse"></span> Catálogo</h2>
-      <p class="text-muted mt-2">Lo que circula hoy en el ágora.</p>
+      <p class="text-muted mt-2">Nuestros productos disponibles.</p>
     </div>
     ${state.categories.length ? `
     <div class="flex flex-wrap gap-2 mb-8">
-      <button data-cat="all" class="cat-chip px-4 py-2 rounded-full text-sm font-semibold border transition ${state.activeCategory === 'all' ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">Todas</button>
+      <button data-cat="all" class="cat-chip px-4 py-2 rounded-full text-sm font-semibold border transition ${state.activeCategory === 'all' ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">Todos</button>
       ${state.categories.map(c => `<button data-cat="${c.name}" class="cat-chip px-4 py-2 rounded-full text-sm font-semibold border transition ${state.activeCategory === c.name ? 'bg-accent border-accent' : 'bg-surface2 border-app text-muted hover:text-main'}">${c.name}</button>`).join('')}
     </div>` : ''}
     ${filtered.length === 0 ? `
       <div class="text-center py-16">
-        <div class="text-6xl mb-4">🏺</div>
+        <div class="text-6xl mb-4"></div>
         <h3 class="font-display font-bold text-2xl mb-2 text-main">Nada por aquí todavía</h3>
-        <p class="text-muted">El ágora se está llenando. Vuelve pronto.</p>
+        <p class="text-muted">Estamos cargando productos. Volvé pronto.</p>
       </div>` : `
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         ${filtered.map(p => `
@@ -1211,7 +1205,7 @@ function renderCatalog(parent) {
     if (p) openProductEdit(p);
   }));
   section.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
-    if (!confirm('¿Eliminar este producto del ágora?')) return;
+    if (!confirm('¿Eliminar este producto?')) return;
     await deleteDoc(doc(db, 'products', b.dataset.del));
     showToast('Producto eliminado', 'success');
   }));
@@ -1221,8 +1215,8 @@ function renderMyOrders(parent) {
   const section = document.createElement('section');
   section.innerHTML = `
     <div class="mb-6">
-      <h2 class="font-display font-bold text-2xl text-main flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-accent"></span> Mis órdenes</h2>
-      <p class="text-muted text-sm mt-1">Tu historial en el ágora.</p>
+      <h2 class="font-display font-bold text-2xl text-main flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-accent"></span> Mis compras</h2>
+      <p class="text-muted text-sm mt-1">Tu historial de compras.</p>
     </div>
     <div id="my-orders-content" class="bg-surface border border-app rounded-2xl p-6"><div class="py-8 text-center text-muted text-sm">Cargando...</div></div>`;
   parent.appendChild(section);
@@ -1231,7 +1225,7 @@ function renderMyOrders(parent) {
     (snap) => {
       const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const c = $('my-orders-content');
-      if (!orders.length) { c.innerHTML = '<div class="py-8 text-center text-muted text-sm">Aún no has realizado ninguna compra.</div>'; return; }
+      if (!orders.length) { c.innerHTML = '<div class="py-8 text-center text-muted text-sm">Aún no hiciste ninguna compra.</div>'; return; }
       c.innerHTML = `<div class="space-y-3">${orders.map(o => `
         <div class="bg-surface2 border border-app rounded-xl p-4 hover:border-accent transition">
           <div class="flex items-center justify-between mb-2">
@@ -1293,8 +1287,8 @@ function renderCart() {
       </div>
     </div>`).join('')}</div>`;
   let footerBtn = '';
-  if (!state.profile) footerBtn = `<button id="btn-checkout" class="w-full btn-ghost py-3.5 rounded-xl font-bold">Completa tu perfil para continuar</button>`;
-  else if (state.profile.zone === 'waitlist') footerBtn = `<button disabled class="w-full btn-accent py-3.5 rounded-xl font-bold">⏳ Sin envíos a tu zona (lista de espera)</button>`;
+  if (!state.profile) footerBtn = `<button id="btn-checkout" class="w-full btn-ghost py-3.5 rounded-xl font-bold">Completá tu perfil para continuar</button>`;
+  else if (state.profile.zone === 'waitlist') footerBtn = `<button disabled class="w-full btn-accent py-3.5 rounded-xl font-bold">⏳ Sin envíos a tu zona</button>`;
   else footerBtn = `<button id="btn-checkout" class="w-full btn-accent py-3.5 rounded-xl font-bold">Continuar con la compra</button>`;
   footer.innerHTML = `
     <div class="flex items-center justify-between mb-4">
@@ -1323,7 +1317,7 @@ function openCheckout() {
   openModal('modal-checkout');
 }
 $('btn-cart').addEventListener('click', () => {
-  if (!state.user) { showToast('Inicia sesión para ver tu carrito'); openModal('modal-login'); return; }
+  if (!state.user) { showToast('Iniciá sesión para ver tu carrito'); openModal('modal-login'); return; }
   renderCart(); openModal('modal-cart');
 });
 $('btn-close-cart').addEventListener('click', () => closeModal('modal-cart'));
@@ -1394,7 +1388,6 @@ async function handleMpReturn() {
 
   if (!orderId) return;
 
-  // Limpiar URL
   if (url.searchParams.toString()) {
     window.history.replaceState({}, '', window.location.pathname);
   }
@@ -1468,7 +1461,7 @@ function showPaymentBanner(type, title, message) {
         <h3 class="font-display font-bold text-xl ${textColor} mb-2">${title}</h3>
         <p class="text-sm text-main leading-relaxed">${message}</p>
         <div class="mt-4 flex flex-wrap gap-2">
-          <button class="btn-ghost px-4 py-2 rounded-lg text-sm font-semibold">Ver mis órdenes</button>
+          <button class="btn-ghost px-4 py-2 rounded-lg text-sm font-semibold">Ver mis compras</button>
           <button class="btn-accent px-4 py-2 rounded-lg text-sm font-bold">Seguir comprando</button>
         </div>
       </div>
@@ -1491,7 +1484,6 @@ function showPaymentBanner(type, title, message) {
 
   main.prepend(banner);
   
-  // Auto-remover después de 30 segundos
   setTimeout(() => {
     if (banner.parentNode) {
       banner.style.opacity = '0';
@@ -1508,8 +1500,8 @@ $('btn-close-support').addEventListener('click', () => closeModal('modal-support
 $('btn-send-support').addEventListener('click', () => {
   const msg = $('support-message').value.trim();
   const contact = $('support-contact').value.trim();
-  if (!msg) { showToast('Escribe tu consulta', 'error'); return; }
-  if (!contact) { showToast('Debes incluir un contacto telefónico/WhatsApp', 'error'); return; }
+  if (!msg) { showToast('Escribí tu consulta', 'error'); return; }
+  if (!contact) { showToast('Debés incluir un contacto telefónico/WhatsApp', 'error'); return; }
   const subject = encodeURIComponent(`Soporte Agorlab — ${state.profile?.nickname || state.user?.displayName || 'Consulta'}`);
   const body = encodeURIComponent(`${msg}\n\n---\nContacto telefónico/WhatsApp: ${contact}\nUsuario: ${state.user?.email || 'no logueado'}`);
   window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
